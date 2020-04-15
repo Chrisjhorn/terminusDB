@@ -533,7 +533,7 @@ if __name__ == "__main__":
 
     print("\nFind sets of charities with a common trustee..(may take a few seconds)..")
     df = busy_trustees(2)
-    print("There are {} sets of {} charities linked by a common trustee".format('no' if df is None else df.size[0], 2))
+    print("There are {:,} sets of {:,} charities linked by a common trustee".format('no' if df is None else df.shape[0], 2))
 
     print("\nExtract a subgraph..(may take a few seconds..)")
     target_charity = "Daingean Community Childcare Services Limited"
