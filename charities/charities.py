@@ -30,12 +30,14 @@ import woqlclient.woqlDataframe as wdf
 
 #######################################################################################################################
 
-SUPPRESS_TERMINUS_DIAGNOSICS    = True          # whether to hide TerminusDB connection messages
+SUPPRESS_TERMINUS_DIAGNOSICS    = True              # whether to hide TerminusDB connection messages
 
-CSV                             = "quads.csv"   # Filename containing the raw data
-                                                # Remember to set your TERMINUS_LOCAL environment variable
-                                                # appropriately to reach this as a local file:  see
-                                                #    https://medium.com/terminusdb/loading-your-local-files-in-terminusdb-e0b5dfbe59b4
+CSV                             = "quads.csv"       # Filename containing the raw data
+                                                    # Remember to set your TERMINUS_LOCAL environment variable
+                                                    # appropriately to reach this as a local file:  see
+                                                    #    https://medium.com/terminusdb/loading-your-local-files-in-terminusdb-e0b5dfbe59b4
+
+PLOT_FILE                       = "charities.png"   # Where to place the plot produced by the networkx module
 
 server_url                      = "http://localhost:6363"
 dbId                            = "charitiesDB"
@@ -164,10 +166,11 @@ def get_csv_variables(url):
     #  The first parameter in each woql_as must be a column name from the .csv
     #
     wq = WOQLQuery().get(
-            WOQLQuery().woql_as("Name", "v:Trustee").
+            WOQLQuery().woql_as("Appt", "v:Appt").
+                        woql_as("Name", "v:Trustee").
                         woql_as("Charity", "v:Charity").
                         woql_as("Registered Number", "v:charity_number").
-                        woql_as("Date", "v:Appointed")
+                        woql_as("Date", "v:Date")
         )
     return apply_query_to_url(wq, url)
 
@@ -181,7 +184,7 @@ def get_wrangles():
     return [
          WOQLQuery().idgen("doc:Charity", ["v:Charity"], "v:Charity_ID"),
          WOQLQuery().idgen("doc:Trustee", ["v:Trustee"], "v:Trustee_ID"),
-         WOQLQuery().idgen("doc:Appointed", ["v:Appointed"], "v:Appointed_ID")
+         WOQLQuery().idgen("doc:Appointed", ["v:Appt"], "v:Appointed_ID")
     ]
 
 
@@ -199,10 +202,10 @@ def get_inserts():
         WOQLQuery().insert("v:Trustee_ID", "Trustee").label("v:Trustee").
             property("trustee_name", "v:Trustee"),
 
-        WOQLQuery().insert("v:Appointed_ID", "Appointed").label("v:Appointed").
+        WOQLQuery().insert("v:Appointed_ID", "Appointed").label("v:Appt").
             property("trustee", "v:Trustee_ID").                    # Important to use Trustee_ID here,  not Trustee
             property("trustee_of", "v:Charity_ID").                 # ditto for Charity_ID - otherwise type subsumption error
-            property("date_appointed", "v:Appointed")
+            property("date_appointed", "v:Date")
       )
 
 
@@ -366,21 +369,60 @@ def sub_query_appointment(N):
         A utility function to aid the busy_trustees function later below.
 
         Build a list of queries relating to the appointment to a charity for each trustee.  Each search
-        for an appointment requires 4 sub-queries.
+        for an appointment requires 5 sub-queries.
 
         Since the same trustee may be appointed to several charities,  this function builds a query combination
-        for N different charities,  all with the same trustee, including 4*N sub-queries
+        for N different charities,  all with the same trustee, including 5*N sub-queries.
+
+        There are two steps:  first find a match for what we want -- a set of charities with a common trustee.
+        Second step is then simply to extract the various properties from the match,  that we want as the answer..
 
         :param N:       integer,  the minumum number of charities which each trustee must have, to satisfy the overall query
-        :return:        a woql and with a variable list of sub-queries,  depending on the value of N
+        :return:        a woql and with a variable set of sub-queries,  depending on the value of N
     '''
-    z = [(WOQLQuery().triple("v:Appointment{}".format(i), "trustee", "v:Trustee"),
-          WOQLQuery().triple("v:Appointment{}".format(i), "trustee_of", "v:Charity{}".format(i)),
-          WOQLQuery().triple("v:Appointment{}".format(i), "date_appointed", "v:date_appointed{}".format(i)),
-          WOQLQuery().triple("v:Charity{}".format(i), "charity_name", "v:Charity_Name{}".format(i))) for i in range(1, N+1)]
-    y = [WOQLQuery().greater("v:Charity{}".format(i), "v:Charity{}".format(i+1)) for i in range(1,N)]
-    q = [item for sublist in z for item in sublist] + y
-    return WOQLQuery().woql_and(*q)
+
+    #
+    #  First part:  fixed sub-query to pick out the first appointment and charity for some Trustee
+    #
+    sq1 = [WOQLQuery().triple("v:Appointment1", "trustee", "v:Trustee"),
+           WOQLQuery().triple("v:Appointment1", "trustee_of", "v:Charity1")]
+
+    #
+    #  Second part: set of sub-queries,  in which each further appointment and charity
+    #  are found;  but also ensure they differ from the prior set.  Use WOQLquery().greater here
+    #  rather than "not equal",  so we don't end up with repeated pairs of matches.
+    #
+    #  Note that if the query succeeds beyond the second part,  then we've found a match for what
+    #  we're seeking (a set of charities with a common trustee);  and the remaining parts just simply
+    #  pick up the various properties we want as the answer.
+    #
+    sq2 = [(WOQLQuery().triple("v:Appointment{}".format(i), "trustee", "v:Trustee"),
+            WOQLQuery().triple("v:Appointment{}".format(i), "trustee_of", "v:Charity{}".format(i)),
+            WOQLQuery().greater("v:Charity{}".format(i-1), "v:Charity{}".format(i))
+            ) for i in range(2, N+1)]
+
+    #
+    #  Third part:  fixed sub-query,  just to pick up the name of the Trustee which we're dealing with
+    #
+    sq3 = [WOQLQuery().triple("v:Trustee", "label", "v:Trustee_Name")]
+
+    #
+    #  Fourth part: set of sub-queries,  picking out the additional properties we want
+    #
+    sq4 = [(WOQLQuery().triple("v:Charity{}".format(i), "charity_name", "v:Charity_Name{}".format(i)),
+            WOQLQuery().triple("v:Appointment{}".format(i), "date_appointed", "v:date_appointed{}".format(i))
+            ) for i in range(1, N+1)]
+
+    #
+    #  Bring all the sub-queries together as a single list
+    #
+    sq = sq1 + [item for sublist in sq2 for item in sublist] + \
+            sq3 + [item for sublist in sq4 for item in sublist]
+
+    #
+    #  Unpack the list of queries into a woql_and,  and give this all back to our caller
+    #
+    return WOQLQuery().woql_and(*sq)
 
 
 def busy_trustees(N):
@@ -388,7 +430,7 @@ def busy_trustees(N):
         Search for trustees appointed to at least N different charities.
 
         Uses the sub_query_appointment function above,  to build a search pattern in which the appointment of a
-        trustee to each of N charities is found;  each search for an appointment requires 4 sub-queries.
+        trustee to each of N charities is found;  each search for an appointment requires 5 sub-queries.
         :return:          dataframe with the N charities associated with various trustees,  or None
     '''
 
@@ -396,11 +438,8 @@ def busy_trustees(N):
     selectList.extend(["v:Charity_Name{}".format(i) for i in range(1,N+1)])
     selectList.extend(["v:date_appointed{}".format(i) for i in range(1,N+1)])
 
-    q = WOQLQuery().select(*selectList).woql_and(
-            WOQLQuery().triple("v:Trustee", "label", "v:Trustee_Name"),
-            WOQLQuery().triple("v:Trustee", "type", "scm:Trustee"),
-            sub_query_appointment(N)
-    )
+    q = WOQLQuery().select(*selectList).woql_and(               # NB: in general a list of queries could be given here
+                        sub_query_appointment(N))               # with sub_query_appointment(N) as just one component
     result = execute_query(q)
     return None if is_empty(result) else wdf.query_to_df(result)
 
@@ -463,7 +502,7 @@ def plot_charity(target_charity, trustees):
     pos = nx.spring_layout(G)
     nx.draw(G, pos=pos, node_color=colour_map, with_labels=True, font_size=8, node_size=50)
     nx.draw(G.subgraph(target_charity), pos=pos, node_color='green', with_labels=True, font_size=8, node_size=100)
-    mplt.pyplot.savefig("charities.png")  # save as png
+    mplt.pyplot.savefig(PLOT_FILE)
     mplt.pyplot.show()
 
 #######################################################################################################################
@@ -500,6 +539,7 @@ if __name__ == "__main__":
     #
     #  Some sample queries..
     #
+
     print("\nList all charities....")
     df = list_all_charities()
     print("{:,} charities found".format(df.shape[0]))
@@ -513,16 +553,19 @@ if __name__ == "__main__":
     print("{:,} appointments found".format(df.shape[0]))
 
     print("\nLookup registration...")
-    nr = lookup_registration("Irish Scouting Fellowship")
-    print("'Irish Scouting Fellowship' has registered number {}".format('unknown' if nr is None else nr))
+    charity = "Irish Scouting Fellowship"
+    nr = lookup_registration(charity)
+    print("'{}' has registered number {}".format(charity, 'unknown' if nr is None else nr))
 
     print("\nReverse lookup of registration number...")
-    charity = reverse_lookup_registration(20080846)
-    print("Registered number {} is '{}'".format(20080846, 'unknown' if charity is None else charity))
+    nr = 20080846
+    charity = reverse_lookup_registration(nr)
+    print("Registered number {} is '{}'".format(nr, 'unknown' if charity is None else charity))
 
     print("\nFind charities for a given trustee...")
-    df = list_charities_for("T4682923043509274816")
-    print("Trustee {} is appointed to the following charities".format("T4697892019008911488"))
+    trustee = "T1796596693580697126"
+    df = list_charities_for(trustee)
+    print("Trustee {} is appointed to the following charities".format(trustee))
     print(df)
 
     print("\nList the trustees of a given charity...")
@@ -530,9 +573,14 @@ if __name__ == "__main__":
     print("The following trustees are appointed to '{}'".format("Irish Scouting Fellowship"))
     print(df)
 
-    print("\nFind sets of charities with a common trustee..(may take a few seconds)..")
-    df = busy_trustees(2)
-    print("There are {:,} sets of {:,} charities linked by a common trustee".format(0 if df is None else df.shape[0], 2))
+    print("\nFind sets of charities with a common trustee..")
+    N = 3
+    df = busy_trustees(N)
+    print("There are {:,} sets of {} charities linked by a common trustee".format(0 if df is None else df.shape[0], N))
+    cap = min(df.shape[0], 5)
+    print("{} of them are:".format(cap))
+    pd.set_option('display.max_columns', None)                          # so that we print out all of the columns...
+    print(df.head(cap))
 
     print("\nExtract a subgraph..(may take a few seconds..)")
     target_charity = "Daingean Community Childcare Services Limited"
