@@ -496,7 +496,6 @@ def plot_charity(target_charity, trustees):
         else:
             colour_map.append('blue')
 
-    # fig = \
     mplt.pyplot.figure(figsize=(11, 8))
     mplt.pyplot.title(target_charity)
     pos = nx.spring_layout(G)
