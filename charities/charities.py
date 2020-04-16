@@ -7,7 +7,7 @@
 ##  Base data is publicly available at:
 ##     https://www.charitiesregulator.ie/en/information-for-the-public/search-the-register-of-charities
 ##
-##  Although the individual names of Irish charity trustees are published by the Irish Charities Regulator at the
+##  Although the individual names of Irish charity trustees are published by the Irish Charities Regulator at 
 ##  this web site,  for the demo these trustee names have been obfuscated in the form "T<number".
 ##
 ##  Chris Horn
