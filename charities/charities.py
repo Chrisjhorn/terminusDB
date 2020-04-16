@@ -488,7 +488,6 @@ if __name__ == "__main__":
             client.deleteDatabase(dbId)
     except Exception as e:
         print("[No prior database to delete]")
-        diagnose(e)
     try:
         print("[Creating new database..]")
         with suppress_Terminus_diagnostics():
