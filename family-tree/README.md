@@ -10,4 +10,4 @@ The raw data for the demo is the `people.csv` file.  If you want to download the
 Because the TerminusDB crew are headquartered in Ireland,  I had of course to use Irish names in the family-tree :-)
 
 ## Log output
-The log output from the demo is [here](https://github.com/Chrisjhorn/terminusDB/blob/master/family-tree/family_sshot.png) - download it to see the full .png file.
+The log output from the demo is [here](https://github.com/Chrisjhorn/terminusDB/blob/master/family-tree/family_ss.png) - download it to see the full .png file.
