@@ -7,20 +7,18 @@
 ##  Base data is publicly available at:
 ##     https://www.charitiesregulator.ie/en/information-for-the-public/search-the-register-of-charities
 ##
-##  Although the individual names of Irish charity trustees are published by the Irish Charities Regulator at 
+##  Although the individual names of Irish charity trustees are published by the Irish Charities Regulator at
 ##  this web site,  for the demo these trustee names have been obfuscated in the form "T<number".
 ##
 ##  Chris Horn
 ##  April 2020
 ##
 
-import requests
 import pandas as pd
-import os
-import sys
 
 import networkx as nx
 import matplotlib as mplt
+import matplotlib.pyplot
 
 import woqlclient.woqlClient as woql
 from woqlclient import WOQLQuery
@@ -28,11 +26,13 @@ import woqlclient.errors as woqlError
 
 import woqlclient.woqlDataframe as wdf
 
+import woqlDiagnosis as wary
+
 #######################################################################################################################
 
-SUPPRESS_TERMINUS_DIAGNOSICS    = True              # whether to hide TerminusDB connection messages
+CSV                             = "https://raw.githubusercontent.com/Chrisjhorn/terminusDB/master/charities/raw/quads.csv"
 
-CSV                             = "quads.csv"       # Filename containing the raw data
+                               #  "quads.csv"       # Filename containing the raw data if your want to make it local..
                                                     # Remember to set your TERMINUS_LOCAL environment variable
                                                     # appropriately to reach this as a local file:  see
                                                     #    https://medium.com/terminusdb/loading-your-local-files-in-terminusdb-e0b5dfbe59b4
@@ -46,56 +46,6 @@ dburl                           = server_url + "/" + dbId
 
 
 #######################################################################################################################
-
-def diagnose(e):
-    '''
-        Try and provide some help in diagnosing an unexpected exception...and then exit.
-    '''
-    print(e)
-    if type(e) == requests.exceptions.ConnectionError:
-        print("Is your TerminusDB server running?..")
-    elif type(e) == woqlError.APIError:
-        if e.errorObj["terminus:message"][:len("Error: existence_error")] == "Error: existence_error":
-            print("Did you forget to correctly set the 'TERMINUS_LOCAL' for the TerminusDB server?..")
-        elif e.errorObj["terminus:message"][:len("The variables: ")] == "The variables: ":
-            print("Coding error - Possibly one of your schema doctypes is uninitialised from your .csv file?")
-    sys.exit(-1)
-
-
-class suppress_Terminus_diagnostics:
-    '''
-        Suppress information messages from the TerminusDB libraries.
-
-        At some point,  the woqlclient library will probably have an explicit setting to do this.
-
-        In the meantime,  cf https://stackoverflow.com/questions/8391411
-    '''
-
-    def __enter__(self):
-        if SUPPRESS_TERMINUS_DIAGNOSICS:
-            self._original_stdout = sys.stdout
-            sys.stdout = open(os.devnull, 'w')
-
-    def __exit__(self, exc_type, exc_val, exc_tb):
-        if SUPPRESS_TERMINUS_DIAGNOSICS:
-            sys.stdout.close()
-            sys.stdout = self._original_stdout
-
-
-def execute_query(q):
-    '''
-        Carefully do a woql query
-        :param q:        a woql query
-        :return:         the result of the woql query
-    '''
-    try:
-        with suppress_Terminus_diagnostics():
-            result = q.execute(client)
-    except woqlError.APIError as e:
-        diagnose(e)
-    return result
-
-#######################################################################################################################
 #
 #   Initialisation of the TerminusDB graph from raw data in a .csv file
 #
@@ -105,6 +55,7 @@ def apply_query_to_url(woqlGet, url):
         Use either a local file or remote http resource,  to execute a woql get query.
         In the case of a local file,  it should be the file path relative to the value of the
         TERMINUS_LOCAL environment variable set when the TerminusDB server was started...
+
         :param woqlGet:         a woql get query
         :param url:             string,  eiher a local file name or http-style url
         :return:                return value from executing the woql get
@@ -149,16 +100,17 @@ def create_schema(client):
     )
     try:
         print("[Building schema..]")
-        with suppress_Terminus_diagnostics():
+        with wary.suppress_Terminus_diagnostics():
             schema.execute(client)
     except Exception as e:
-        diagnose(e)
+        wary.diagnose(e)
 
 
 def get_csv_variables(url):
     '''
         Read a .csv file,  and use some or all of its columns to initialise
         the doctypes established in the schema.
+
         :param url:         string,  either local file name (relative to TERMINUS_LOCAL env. var.) or remote URL
         :return:            result of executing a woql get query on the .csv file
     '''
@@ -179,6 +131,7 @@ def get_wrangles():
     '''
         Assign TerminusDB unique identifiers for each instance of the schema doctypes,  using the
         lists of .csv column data (one instance for each row of each column;  one column per doctype)
+
         :return:        list of woql queries,  each of which is an idgen
     '''
     return [
@@ -192,6 +145,7 @@ def get_inserts():
     '''
         Build a query to initialise each instance of each doctype with its corresponding
         properties,  using the raw data previously read in from the .csv file
+
         :return:    woql query for all the insertions
     '''
     return WOQLQuery().woql_and(
@@ -214,9 +168,10 @@ def load_csv(client, url):
         Read a .csv file and use its raw data to initialise a graph in the TerminusDB server.
         In the case of a local file,  it should be the file path relative to the value of the
         TERMINUS_LOCAL environment variable set when the TerminusDB server was started...
+
         :param client:      handle on the TerminusDB server
         :param url:         string,  eiher a local file name or http-style url
-    :return:
+        :return:            None
     '''
     csv = get_csv_variables(url)
     wrangles = get_wrangles()
@@ -225,10 +180,10 @@ def load_csv(client, url):
     answer = WOQLQuery().when(inputs, inserts)
     try:
         print("[Loading raw data from '{}'..]".format(url))
-        with suppress_Terminus_diagnostics():
+        with wary.suppress_Terminus_diagnostics():
             answer.execute(client)
     except woqlError.APIError as e:
-        diagnose(e)
+        wary.diagnose(e)
 
 #######################################################################################################################
 #
@@ -238,6 +193,7 @@ def load_csv(client, url):
 def is_empty(q):
     '''
         Test for an empty query result
+
         :param q:   Woql query result
     '''
     return len(q['bindings']) == 0
@@ -250,7 +206,7 @@ def list_all_charities():
     q = WOQLQuery().select("v:number", "v:Charity_Name").woql_and(
             WOQLQuery().triple("v:Charity", "charity_name", "v:Charity_Name"),
             WOQLQuery().triple("v:Charity", "charity_number", "v:number"))
-    result = execute_query(q)
+    result = wary.execute_query(q, client)
     return pd.DataFrame(columns=["number", "Charity_Name"]) if is_empty(result) else wdf.query_to_df(result)
 
 
@@ -261,7 +217,7 @@ def list_all_trustees():
     q = WOQLQuery().select("v:Trustee_Name").woql_and(
             WOQLQuery().triple("v:Trustee", "trustee_name", "v:Trustee_Name")
     )
-    result = execute_query(q)
+    result = wary.execute_query(q, client)
     return pd.DataFrame(columns=["Trustee_Name"]) if is_empty(result) else wdf.query_to_df(result)
 
 
@@ -276,13 +232,14 @@ def list__all_appointments():
             WOQLQuery().triple("v:Trustee", "trustee_name", "v:Trustee_Name"),
             WOQLQuery().triple("v:Charity", "charity_name", "v:Charity_Name")
     )
-    result = execute_query(q)
+    result = wary.execute_query(q, client)
     return pd.DataFrame(columns=["Trustee_Name", "Charity_Name", "date_appointed"]) if is_empty(result) else wdf.query_to_df(result)
 
 
 def lookup_registration(charity):
     '''
         Lookup the registration number for a given charity
+
         :param charity:     string, charity name
         :return:            integer,  registration number or None if unknown
     '''
@@ -295,7 +252,7 @@ def lookup_registration(charity):
                 WOQLQuery().triple("v:Charity", "charity_name", {"@type": "xsd:string", "@value": charity}),
                 WOQLQuery().triple("v:Charity", "charity_number", "v:number")
         )
-    result = execute_query(q)
+    result = wary.execute_query(q, client)
 
     #
     # Could walk the result binding to extract the (sole) decimal value - but easier just to use a dataframe
@@ -306,13 +263,14 @@ def lookup_registration(charity):
 def reverse_lookup_registration(regNumber):
     '''
         Lookup the charity with the given registration number
+
         :param regNumber:       integer, registration number
         :return:                string,  charity name or None if unknown
     '''
     q = WOQLQuery().select("v:Charity_Name").woql_and(
               WOQLQuery().triple("v:Charity", "charity_name", "v:Charity_Name"),
               WOQLQuery().triple("v:Charity", "charity_number", regNumber))
-    result = execute_query(q)
+    result = wary.execute_query(q, client)
 
     #
     # Could walk the result binding to extract the (sole) string value - but easier just to use a dataframe
@@ -323,6 +281,7 @@ def reverse_lookup_registration(regNumber):
 def list_charities_for(trustee__name):
     '''
         Find all the charities to which a trustee is appointed
+
         :param trustee__name:       string, a trustee
         :return:                    dataframe with charities and appointment dates
     '''
@@ -338,13 +297,14 @@ def list_charities_for(trustee__name):
             WOQLQuery().triple("v:Trustee", "trustee_name", {"@type": "xsd:string", "@value": trustee__name}),
             WOQLQuery().triple("v:Charity", "charity_name", "v:Charity_Name")
     )
-    result = execute_query(q)
+    result = wary.execute_query(q, client)
     return pd.DataFrame(columns=["Charity_Name", "date_appointed"]) if is_empty(result) else wdf.query_to_df(result)
 
 
 def query_trustees_for(charity__name):
     '''
         Find all the trustees appointed to a given charity
+
         :param charity__name:       string, a charity
         :return:                    dataframe with trustees and appointment dates
     '''
@@ -360,7 +320,7 @@ def query_trustees_for(charity__name):
             WOQLQuery().triple("v:Trustee", "trustee_name", "v:Trustee_Name"),
             WOQLQuery().triple("v:Charity", "charity_name", {"@type": "xsd:string", "@value": charity__name})
     )
-    result = execute_query(q)
+    result = wary.execute_query(q, client)
     return pd.DataFrame(columns=["Trustee_Name", "date_appointed"]) if is_empty(result) else wdf.query_to_df(result)
 
 
@@ -431,6 +391,7 @@ def busy_trustees(N):
 
         Uses the sub_query_appointment function above,  to build a search pattern in which the appointment of a
         trustee to each of N charities is found;  each search for an appointment requires 5 sub-queries.
+
         :return:          dataframe with the N charities associated with various trustees,  or None
     '''
 
@@ -440,7 +401,7 @@ def busy_trustees(N):
 
     q = WOQLQuery().select(*selectList).woql_and(               # NB: in general a list of queries could be given here
                         sub_query_appointment(N))               # with sub_query_appointment(N) as just one component
-    result = execute_query(q)
+    result = wary.execute_query(q, client)
     return None if is_empty(result) else wdf.query_to_df(result)
 
 
@@ -477,6 +438,7 @@ def query_network(charity_name, trustees=[], charities=[]):
 def plot_charity(target_charity, trustees):
     '''
         Produce a graph plot showing the charities and trustees reachable from a given charity
+
         :param target_charity:  string,  a given charity
         :param trustees:        the list of trustees of that charity
     '''
@@ -515,25 +477,26 @@ if __name__ == "__main__":
     client = woql.WOQLClient()
     try:
         print("[Connecting to the TerminusDB server..]")
-        with suppress_Terminus_diagnostics():
+        with wary.suppress_Terminus_diagnostics():
             client.connect(server_url, key)
     except Exception as e:
         print("[TerminusDB server is apparently not running?]")
-        diagnose(e)
+        wary.diagnose(e)
     try:
         print("[Removing prior version of the database,  if it exists..]")
-        with suppress_Terminus_diagnostics():
+        with wary.suppress_Terminus_diagnostics():
             client.deleteDatabase(dbId)
     except Exception as e:
         print("[No prior database to delete]")
     try:
         print("[Creating new database..]")
-        with suppress_Terminus_diagnostics():
+        with wary.suppress_Terminus_diagnostics():
             client.createDatabase(dbId, "Charities", key=None, comment="Irish Charities graphbase")
     except Exception as e:
-        diagnose(e)
+        wary.diagnose(e)
     create_schema(client)
     load_csv(client, CSV)
+
 
     #
     #  Some sample queries..
@@ -565,12 +528,12 @@ if __name__ == "__main__":
     trustee = "T1796596693580697126"
     df = list_charities_for(trustee)
     print("Trustee {} is appointed to the following charities".format(trustee))
-    print(df)
+    print(df.to_string(index=False))
 
     print("\nList the trustees of a given charity...")
     df = query_trustees_for("Irish Scouting Fellowship")
     print("The following trustees are appointed to '{}'".format("Irish Scouting Fellowship"))
-    print(df)
+    print(df.to_string(index=False))
 
     print("\nFind sets of charities with a common trustee..")
     N = 3
@@ -579,7 +542,7 @@ if __name__ == "__main__":
     cap = min(df.shape[0], 5)
     print("{} of them are:".format(cap))
     pd.set_option('display.max_columns', None)                          # so that we print out all of the columns...
-    print(df.head(cap))
+    print(df.head(cap).to_string(index=False))
 
     print("\nExtract a subgraph..(may take a few seconds..)")
     target_charity = "Daingean Community Childcare Services Limited"
