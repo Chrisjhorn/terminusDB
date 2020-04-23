@@ -61,8 +61,12 @@ def diagnose_api_witness_error(e, violation, errorMsg, diagnosis):
     wDict= e.errorObj["terminus:witnesses"][0]
     if wDict["@type"] != violation:
         return False
-    if wDict["vio:literal"][1:len(errorMsg)+1] != errorMsg:
-        return False
+    if violation != "vio:PropertyWithUndefinedDomain":
+        if violation == "vio:ViolationWithDatatypeObject":
+            if wDict["vio:message"] != errorMsg:
+                return False
+        elif wDict["vio:literal"][1:len(errorMsg)+1] != errorMsg:
+            return False
     print(diagnosis)
     return True
 
@@ -106,6 +110,9 @@ def diagnose(e):
         if diagnose_api_error(e, "terminus:message", "Error: existence_error",
                 "Did you forget to correctly set the 'TERMINUS_LOCAL' for the TerminusDB server?.."):
             pass
+        elif diagnose_api_error(e, "terminus:message", "Not a valid key",
+                "It appears you have an invalid server key, or are trying to contact the wrong server?"):
+            pass
         elif diagnose_api_error(e, "terminus:message", "The variables: ",
                 "Coding error:\n" +
                 " Possibly one of your schema doctypes is uninitialised from your .csv file?\n"):
@@ -118,15 +125,25 @@ def diagnose(e):
                 "   Did you read a .csv column,  but then not use it?\n" +
                 "   Or try to read a variable which does not appear in your .csv columns?"):
             pass
-        elif diagnose_api_witness_error(e, "vio:ViolationWithDatatypeObject", "Too few values in get:",
+        elif diagnose_api_witness_error(e, "vio:ViolationWithDataObject", "Too few values in get:",
                 "Data error:\n" +
                 "   Is at least one of your rows of your .csv file missing a value?"):
+            pass
+        elif diagnose_api_witness_error(e, "vio:PropertyWithUndefinedDomain", "",
+                "Data error:\n" +
+                "   Is your schema missing a defintion for one of your .csv columns?"):
+            pass
+        elif diagnose_api_witness_error(e, "vio:ViolationWithDatatypeObject", "Expected atom, found term as element.",
+                "Data error:\n" +
+                "   Is there a type mismatch between data in one of your .csv columns and its schema counterpart?"):
             pass
         elif diagnose_api_query_error(e, "Un-parsable Query",
                 "Coding error (malformed query):\n" +
                 "   Perhaps you selected a V: variable which is not in the query?\n" +
                 "   Or a malformed/mistyped V: variable?\n"):
             pass
+        else:
+            print("Unable to suggest a diagnosis for the error,  sorry...")
     sys.exit(-1)
 
 

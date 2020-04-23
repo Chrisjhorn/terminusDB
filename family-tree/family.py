@@ -26,7 +26,7 @@ import woqlDiagnosis as wary
 
 CSV                             = "https://raw.githubusercontent.com/Chrisjhorn/terminusDB/master/family-tree/people.csv"
 
-                               # = "people.csv"     # Filename containing the raw data
+                                # = "people.csv"    # Filename containing the raw data
                                                     # Remember to set your TERMINUS_LOCAL environment variable
                                                     # appropriately to reach this as a local file:  see
                                                     #    https://medium.com/terminusdb/loading-your-local-files-in-terminusdb-e0b5dfbe59b4
@@ -74,7 +74,7 @@ def is_empty(q):
 
         :param q:   Woql query result
     '''
-    return len(q['bindings']) == 0
+    return type(q) is not dict or len(q['bindings']) == 0 or q['bindings'][0] == {}
 
 #######################################################################################################################
 #
@@ -133,6 +133,36 @@ def parent_of(child, parent, want_mother=True):
     )
 
 
+def children_of(parent, childVariable="v:Child", childVariableName="v:Child_Name"):
+    '''
+        Return the names of the children of a parent.
+
+        The optional arguments allow a caller (eg a higher level query,  such as grandchildren_of) to
+        control the woql query names of the bindings,  resulting as output.
+
+        :param parent:              string: name of a parent
+        :param childVariable:       string: if given,  the woql variable to use for the results
+        :param childVariableName:   string: if given,  the woql variable to use for the resulting "Name" property
+        :return:                    a woql query for the children
+    '''
+    local_P1 = local_variable("v:P1")                       # Demarcate, because query can be used multiple times
+    local_P2 = local_variable("v:P2")                       # Demarcate, because query can be used multiple times
+
+    #
+    #  Terminus currently has a bug with literal values in queries.  Should be able to do:
+    #     WOQLQuery().triple("v:Parent1", "Name", parent) but instead have to use @type..
+    #
+    parentName =  {'@type' : 'xsd:string', '@value': parent} if parent[:2] != "v:" else parent
+    return WOQLQuery().woql_and(
+        parents_of(childVariable, local_P1, local_P2),
+        WOQLQuery().woql_or(
+            WOQLQuery().triple(local_P1, "Name", parentName),
+            WOQLQuery().triple(local_P2, "Name", parentName),
+        ),
+        WOQLQuery().triple(childVariable, "Name", childVariableName)
+    )
+
+
 def grandmothers_of(child, grandM1, grandM2):
     '''
         Query to return the two grandmothers (doctype) of a child (doctype).
@@ -169,6 +199,27 @@ def grandfathers_of(child, grandF1, grandF2):
                 parent_of(local_P1, grandF1, want_mother=False),
                 parent_of(local_P2, grandF2, want_mother=False)
     )
+
+
+def grandchildren_of(gParent):
+    '''
+        Return the names of the grandchildren of a grandparent.
+
+        Note in this case,  two consecutive calls to the same sub-query "children_of" are made.  The resulting
+        bindings from the first call (in effect the children of the grandparent/parents of the grandchildren) are
+        passed to the second call.  To avoid scope clashes of "v:Child" in the subquery,  a new local variable
+        is introduced here,  and used to control the woql variable name used in the first call.
+
+        :param gParent:     string: name of a gParent
+        :return:            A dataframe with the grandchildren
+    '''
+    local_P = local_variable("v:P")     # introduce a local woql variable here,  which represents the intermediate bindings
+    local_PName = local_P + "_Name"     # the associated "Name" property
+
+    return WOQLQuery().woql_and(
+                children_of(gParent, local_P, local_PName), # control the names of the bindings used in the first call
+                children_of(local_PName)
+        )
 
 #######################################################################################################################
 #
@@ -387,6 +438,22 @@ def list_mother_of(child=None):
     return pd.DataFrame(columns=selects) if is_empty(result) else wdf.query_to_df(result)
 
 
+def list_children_of(parent):
+    '''
+        Return a dataframe with the names of the children of a parent.
+
+        :param parent:      string: name of a parent
+        :return:            If child is None, then a dataframe with all children and their respective mothers.
+                            Otherwise, a dataframe with the mother of the given child
+    '''
+    selects = ["v:Child_Name"]
+    q = WOQLQuery().select(*selects).woql_and(
+            children_of(parent)
+        )
+    result = wary.execute_query(q, client)
+    return pd.DataFrame(columns=selects) if is_empty(result) else wdf.query_to_df(result)
+
+
 def list_grandmothers_of(child=None):
     '''
         Return a dataframe with the names of the grandmothers of a child.
@@ -439,6 +506,21 @@ def list_grandfathers_of(child=None):
     return pd.DataFrame(columns=selects) if is_empty(result) else wdf.query_to_df(result)
 
 
+def list_grandchildren_of(gParent):
+    '''
+        Return a dataframe with the names of the grandchildren of a grandparent.
+
+        :param gParent:     string: name of a grandparent
+        :return:            a dataframe with all the grandchildren
+    '''
+
+    selects = ["v:Child_Name"]
+    q = WOQLQuery().select(*selects).woql_and(
+            grandchildren_of(gParent)
+        )
+    result = wary.execute_query(q, client)
+    return pd.DataFrame(columns=selects) if is_empty(result) else wdf.query_to_df(result)
+
 #######################################################################################################################
 
 if __name__ == "__main__":
@@ -453,7 +535,6 @@ if __name__ == "__main__":
         with wary.suppress_Terminus_diagnostics():
             client.connect(server_url, key)
     except Exception as e:
-        print("[TerminusDB server is apparently not running?]")
         wary.diagnose(e)
     try:
         print("[Removing prior version of the database,  if it exists..]")
@@ -503,6 +584,10 @@ if __name__ == "__main__":
     df = list_mother_of("Mary")
     print(df.to_string(index=False))
 
+    print("\nList Seamus's children....")
+    df = list_children_of("Seamus")
+    print(df.to_string(index=False))
+
     print("\nList all grandmothers....")
     df = list_grandmothers_of()
     print(df.to_string(index=False))
@@ -517,4 +602,8 @@ if __name__ == "__main__":
 
     print("\nList Joe's grandfathers....")
     df = list_grandfathers_of("Joe")
+    print(df.to_string(index=False))
+
+    print("\nList Roisin's grandchildren....")
+    df = list_grandchildren_of("Roisin")
     print(df.to_string(index=False))
