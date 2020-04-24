@@ -7,4 +7,4 @@ Like the original `family-tree`,  it uses a simple schema of a family tree, to s
 This style of Woql usage is reminiscent of Prolog clauses.
 
 ## Log output
-The log output from the demo is [here](https://github.com/Chrisjhorn/terminusDB/blob/master/family-tree/family_2_ss.png) - download it to see the full .png file.
+The log output from the demo is [here](https://github.com/Chrisjhorn/terminusDB/blob/master/family-tree-2/family-2_ss.png).
