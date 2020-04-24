@@ -1,5 +1,5 @@
 # TerminusDB
-Some contributed demo and tutorial software to [TerminusDB](https://terminusdb.com/) open source graph base.
+Some contributed demo and tutorial software to the [TerminusDB](https://terminusdb.com/) open source graph base.
 
 ## Tutorials
 So far,  I only have three:
