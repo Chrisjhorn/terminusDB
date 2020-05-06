@@ -3,6 +3,7 @@
 ##
 ##  Shows the use of a base class to capture ephemeral events.
 ##
+##  Map handling in python is described in eg https://towardsdatascience.com/easy-steps-to-plot-geographic-data-on-a-map-python-11217859a2db
 ##
 ##  Chris Horn
 ##  May 2020
@@ -16,6 +17,7 @@ import datetime
 import sys
 import math
 import pandas as pd
+import os.path
 
 import woqlDiagnosis as wary
 import woqlclient.woqlClient as woql
@@ -24,13 +26,12 @@ import woqlclient.errors as woqlError
 import woqlclient.woqlDataframe as wdf
 
 
+
 ########################################################################################################################
+
 
 VOYAGES_CSV                         = "voyages.csv"
 DOCKINGS_CSV                        = "dockings.csv"
-
-                                    # = "https://raw.githubusercontent.com/Chrisjhorn/terminusDB/master/family-tree/people.csv"
-
                                     # Filenames containing the raw data
                                     # Remember to set your TERMINUS_LOCAL environment variable
                                     # appropriately to reach this as a local file:  see
@@ -1033,6 +1034,9 @@ if __name__ == "__main__":
     plt.xlim(BBox[0], BBox[1])                                      # set bounding box on the plot..
     plt.ylim(BBox[2], BBox[3])
 
+    if not os.path.isfile(MAP_FILE):
+        print("Cannot find the map file {}".format(MAP_FILE))
+        sys.exit(-1)
     zz = plt.imread(MAP_FILE)                                       # load the map file
     ax.imshow(zz, zorder=0,  extent=BBox, aspect= 'equal')          # display the map as the canvas
 
