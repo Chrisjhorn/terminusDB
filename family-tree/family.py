@@ -76,6 +76,19 @@ def is_empty(q):
     '''
     return type(q) is not dict or len(q['bindings']) == 0 or q['bindings'][0] == {}
 
+
+def literal_string(s):
+    '''
+        Handle a string value for Woql.
+
+        Woql currently has a bug,  and this function should not really be necessary.
+        When bug is fixed,  this function can simply 'return s' - ie become a null function
+
+        :param s:   string value
+        :return:    Woql triple for a string literal
+    '''
+    return {'@type': 'xsd:string', '@value': s}
+
 #######################################################################################################################
 #
 #   Composable queries
@@ -122,11 +135,11 @@ def parent_of(child, parent, want_mother=True):
                 parents_of(child, local_P1, local_P2),
                 WOQLQuery().woql_or(
                     WOQLQuery().woql_and(
-                        WOQLQuery().triple(local_P1, "Sex", {"@type": "xsd:string", "@value": sex}),
+                        WOQLQuery().triple(local_P1, "Sex", literal_string(sex)),
                         WOQLQuery().eq(local_P1, parent)
                     ),
                     WOQLQuery().woql_and(
-                        WOQLQuery().triple(local_P2, "Sex", {"@type": "xsd:string", "@value": sex}),
+                        WOQLQuery().triple(local_P2, "Sex", literal_string(sex)),
                         WOQLQuery().eq(local_P2, parent)
                     )
                 )
@@ -152,7 +165,7 @@ def children_of(parent, childVariable="v:Child", childVariableName="v:Child_Name
     #  Terminus currently has a bug with literal values in queries.  Should be able to do:
     #     WOQLQuery().triple("v:Parent1", "Name", parent) but instead have to use @type..
     #
-    parentName =  {'@type' : 'xsd:string', '@value': parent} if parent[:2] != "v:" else parent
+    parentName =  literal_string(parent) if parent[:2] != "v:" else parent
     return WOQLQuery().woql_and(
         parents_of(childVariable, local_P1, local_P2),
         WOQLQuery().woql_or(
@@ -377,7 +390,7 @@ def list_parents_of(child=None):
     #  Terminus currently has a bug with literal values in queries.  Should be able to do:
     #     WOQLQuery().triple("v:Child", "Name", child) here if child is a literal,  but instead have to use @type..
     #
-    child =  "v:Child_Name" if child is None else {'@type' : 'xsd:string', '@value': child}
+    child =  "v:Child_Name" if child is None else literal_string(child)
     q = WOQLQuery().select(*selects).woql_and(
             parents_of("v:Child", "v:Parent1", "v:Parent2"),
             WOQLQuery().triple("v:Child", "Name", child),
@@ -403,7 +416,7 @@ def list_father_of(child=None):
     #  Terminus currently has a bug with literal values in queries.  Should be able to do:
     #     WOQLQuery().triple("v:Child", "Name", child) here if child is a literal,  but instead have to use @type..
     #
-    child =  "v:Child_Name" if child is None else {'@type' : 'xsd:string', '@value': child}
+    child =  "v:Child_Name" if child is None else literal_string(child)
     q = WOQLQuery().select(*selects).woql_and(
             parent_of("v:Child", "v:Father", want_mother=False),
             WOQLQuery().triple("v:Child", "Name", child),
@@ -428,7 +441,7 @@ def list_mother_of(child=None):
     #  Terminus currently has a bug with literal values in queries.  Should be able to do:
     #     WOQLQuery().triple("v:Child", "Name", child) here if child is a literal,  but instead have to use @type..
     #
-    child =  "v:Child_Name" if child is None else {'@type' : 'xsd:string', '@value': child}
+    child =  "v:Child_Name" if child is None else literal_string(child)
     q = WOQLQuery().select(*selects).woql_and(
             parent_of("v:Child", "v:Mother"),
             WOQLQuery().triple("v:Child", "Name", child),
@@ -469,7 +482,7 @@ def list_grandmothers_of(child=None):
     #  Terminus currently has a bug with literal values in queries.  Should be able to do:
     #     WOQLQuery().triple("v:Child", "Name", child) here if child is a literal,  but instead have to use @type..
     #
-    child =  "v:Child_Name" if child is None else {'@type' : 'xsd:string', '@value': child}
+    child =  "v:Child_Name" if child is None else literal_string(child)
     q = WOQLQuery().select(*selects).woql_and(
             grandmothers_of("v:Child", "v:GMother1", "v:GMother2"),
             WOQLQuery().triple("v:Child", "Name", child),
@@ -495,7 +508,7 @@ def list_grandfathers_of(child=None):
     #  Terminus currently has a bug with literal values in queries.  Should be able to do:
     #     WOQLQuery().triple("v:Child", "Name", child) here if child is a literal,  but instead have to use @type..
     #
-    child =  "v:Child_Name" if child is None else {'@type' : 'xsd:string', '@value': child}
+    child =  "v:Child_Name" if child is None else literal_string(child)
     q = WOQLQuery().select(*selects).woql_and(
             grandfathers_of("v:Child", "v:GFather1", "v:GFather2"),
             WOQLQuery().triple("v:Child", "Name", child),

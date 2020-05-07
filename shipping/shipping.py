@@ -982,8 +982,8 @@ def query_status(time):
             #  use optional query triples to pick up alternative properties..
             #
             WOQLQuery().triple("v:Event", "ship", "v:Ship"),
-            WOQLQuery().opt(WOQLQuery().triple("v:Event", "route", "v:Route")),
-            WOQLQuery().opt(WOQLQuery().triple("v:Event", "berth", "v:Berth"))
+            WOQLQuery().opt().triple("v:Event", "route", "v:Route"),
+            WOQLQuery().opt().triple("v:Event", "berth", "v:Berth")
     )
     result = wary.execute_query(q, client)
     return pd.DataFrame(columns=selects) if is_empty(result) else wdf.query_to_df(result)

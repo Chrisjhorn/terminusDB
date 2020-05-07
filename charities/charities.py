@@ -67,6 +67,19 @@ def apply_query_to_url(woqlGet, url):
     return woqlGet.file(url)
 
 
+def literal_string(s):
+    '''
+        Handle a string value for Woql.
+
+        Woql currently has a bug,  and this function should not really be necessary.
+        When bug is fixed,  this function can simply 'return s' - ie become a null function
+
+        :param s:   string value
+        :return:    Woql triple for a string literal
+    '''
+    return {'@type': 'xsd:string', '@value': s}
+
+
 def create_schema(client):
     '''
         Build the schema
@@ -249,7 +262,7 @@ def lookup_registration(charity):
     #     WOQLQuery().triple("v:Charity", "charity_name", charity) here but instead use @type..
     #
     q = WOQLQuery().select("v:number").woql_and(
-                WOQLQuery().triple("v:Charity", "charity_name", {"@type": "xsd:string", "@value": charity}),
+                WOQLQuery().triple("v:Charity", "charity_name", literal_string(charity)),
                 WOQLQuery().triple("v:Charity", "charity_number", "v:number")
         )
     result = wary.execute_query(q, client)
@@ -294,7 +307,7 @@ def list_charities_for(trustee__name):
             WOQLQuery().triple("v:Appointment", "trustee", "v:Trustee"),
             WOQLQuery().triple("v:Appointment", "trustee_of", "v:Charity"),
             WOQLQuery().triple("v:Appointment", "date_appointed", "v:date_appointed"),
-            WOQLQuery().triple("v:Trustee", "trustee_name", {"@type": "xsd:string", "@value": trustee__name}),
+            WOQLQuery().triple("v:Trustee", "trustee_name", literal_string(trustee__name)),
             WOQLQuery().triple("v:Charity", "charity_name", "v:Charity_Name")
     )
     result = wary.execute_query(q, client)
@@ -318,7 +331,7 @@ def query_trustees_for(charity__name):
             WOQLQuery().triple("v:Appointment", "trustee_of", "v:Charity"),
             WOQLQuery().triple("v:Appointment", "date_appointed", "v:date_appointed"),
             WOQLQuery().triple("v:Trustee", "trustee_name", "v:Trustee_Name"),
-            WOQLQuery().triple("v:Charity", "charity_name", {"@type": "xsd:string", "@value": charity__name})
+            WOQLQuery().triple("v:Charity", "charity_name", literal_string(charity__name))
     )
     result = wary.execute_query(q, client)
     return pd.DataFrame(columns=["Trustee_Name", "date_appointed"]) if is_empty(result) else wdf.query_to_df(result)
