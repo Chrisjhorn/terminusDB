@@ -13,4 +13,4 @@ The tutorial brings you through:
 * Making some WOQL Queries, and managing the results
 * Deleting data in your database
 
-*Please* let me know of any issues with the tutorial code!..
+*Please* let me know of any issues with the tutorial code!..  You can reach me on the TerminusDB discord server.
