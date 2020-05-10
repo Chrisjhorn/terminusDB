@@ -1,7 +1,15 @@
 # TerminusDB
-Some contributed demo and tutorial software to the [TerminusDB](https://terminusdb.com/) open source graph base.
+Some contributed tutorial and example software in Python to the [TerminusDB](https://terminusdb.com/) open source graph base.
 
 ## Tutorials
+The tutorials each are a [Jupyter Notebook](https://jupyter.org/),  so that you can interactively run the Python yourself as you read through the text.
+
+If you don't have Jupyter,  then there is also a `.html` file containing the full tutorial, including the results of running each code segment. Git won't display the .html file directly, so download it and then use your browser to view the download.
+
+I hope in due course to do a series of tutorials.  Right now,  there is just:
+* Tutorial 1 - getting started with TerminusDB
+
+## Examples
 So far,  I only have four:
 * `charities` -- an example of an M:N relationship schema,  using public data about registered Irish charities.
 * `family-tree` -- an example of using composable subqueries,  using an external .csv file as raw data
