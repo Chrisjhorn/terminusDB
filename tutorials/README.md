@@ -5,3 +5,5 @@ If you don't have Jupyter,  then there is also a `.html` file containing the ful
 
 I hope in due course to do a series of tutorials.  Right now,  there is just:
 * `Tutorial 1` - getting started with TerminusDB
+
+`Tutorial2` is work in progress, and incomplete. It will be a tutorial on handling .csv files once I finish it..
