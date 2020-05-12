@@ -13120,7 +13120,15 @@ div#notebook {
 
 </div>
 </div>
-</div>Nr,Name,Age,Partner
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+<div class="output_area">
+<div class="prompt"></div>
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>
+Nr,Name,Age,Partner
 0,John,34,Marie
 1,Anne,26,Peter
 2,Mike,28,Jenny
@@ -13132,6 +13140,11 @@ div#notebook {
 8,Jim,36,Kris
 9,Dave,34,
 10,Sue,26,
+</pre>
+</div>
+</div>
+</div>
+</div>
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
@@ -13355,9 +13368,25 @@ sendRequestByAction_____________ woql_update
 
 </div>
 </div>
-</div>$ ./terminus-container stop
-$ export TERMINUS_LOCAL=<path to whatever part of your local filesystem you have chosen>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+<div class="output_area">
+<div class="prompt"></div>
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>
+
+$ ./terminus-container stop
+$ export TERMINUS_LOCAL=&lt;path to whatever part of your local filesystem you have chosen&gt;
 $ ./terminus-container run
+
+</pre>
+</div>
+</div>
+</div>
+</div>
+
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
@@ -13365,9 +13394,23 @@ $ ./terminus-container run
 
 </div>
 </div>
-</div>MOUNT <path to whatever part of your local filesystem you have chosen>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+<div class="output_area">
+<div class="prompt"></div>
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>
+MOUNT &lt;path to whatever part of your local filesystem you have chosen&gt;
 TO "/app/local_files"
 terminus-server container started http://localhost:6363/console
+</pre>
+</div>
+</div>
+</div>
+</div>
+
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
@@ -13465,10 +13508,26 @@ sendRequestByAction_____________ woql_update
 
 </div>
 </div>
-</div>URL =" https://raw.githubusercontent.com/Chrisjhorn/terminusDB/master/tutorials/tutorial2/people.csv"
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+<div class="output_area">
+<div class="prompt"></div>
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>
+
+URL =&quot;https://raw.githubusercontent.com/Chrisjhorn/terminusDB/master/tutorials/tutorial2/people.csv&quot;
 
 result1 = apply_query_to_url(wq, URL)           # either use a URL,  or 
-result2 = apply_query_to_url(wq, "people.csv")  # use a local file
+result2 = apply_query_to_url(wq, &quot;people.csv&quot;)  # use a local file
+
+</pre>
+</div>
+</div>
+</div>
+</div>
+
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
