@@ -6,3 +6,5 @@ If you don't have Jupyter,  then there is also a `.html` file containing the ful
 I hope in due course to do a series of tutorials.  Right now,  there is just:
 * `Tutorial 1` - getting started with TerminusDB
 * `Tutorial 2` - loading .csv files (locally or over the internet) into TerminusDB, and cleaning up data
+
+Tutorial 3 is in preparation: not much to see there just yet..
