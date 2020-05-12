@@ -12,6 +12,4 @@ The tutorial brings you through:
 * Inserting the new documents into TerminusDB
 * Examining the documents, and cleaning up any rogue data
 
-I've noticed that the .html file here is not a completely faithful capture of what the Jupyter Notebook displays,  and has some formatting issues.  It was created using the `download` converter in the Notebook.  I'll have to go in manually and clean up the generated .html,  I'll do this when I get a few minutes..  Apologies.
-
 Please let me know of any issues with the tutorial code!.. You can reach me on the TerminusDB discord server.
