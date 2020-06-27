@@ -2,9 +2,9 @@
 This is an Alpha Release for supporting WOQL (Web Oriented Query Language) in Swipl for the [TerminusDB](https://terminusdb.com/) open source graph base.
 
 ## Index:
-* Installation
-* Brief Summary
-* Quick Start
+* [Installation](#installation)
+* [Brief Summary](#brief-summary)
+* [Quick Start](#quick-start)
 * [Client API](#client-api)
 
 ## Installation
