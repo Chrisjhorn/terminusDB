@@ -1,18 +1,21 @@
-# TerminusDB
-Some contributed tutorial and example software in Python to the [TerminusDB](https://terminusdb.com/) open source graph base.
+# Swoql - Swipl and WOQL
+This is an Alpha Release for supporting WOQL (Web Oriented Query Language) in Swipl for the [TerminusDB](https://terminusdb.com/) open source graph base.
 
-## Tutorials
-The tutorials each are a [Jupyter Notebook](https://jupyter.org/),  so that you can interactively run the Python yourself as you read through the text.
+## Installation
+Install [Swipl](https://www.swi-prolog.org/download/stable).
 
-If you don't have Jupyter,  then there is also a `.html` file containing the full tutorial, including the results of running each code segment. Git may not display the .html file directly, so download it and then use your browser to view the download.
+Download the modules and folders here.
 
-I hope in due course to do a series of tutorials.  Right now,  there is just:
-* `Tutorial 1` - getting started with TerminusDB
-* `Tutorial 2` - loading .csv files (locally, or over the internet) into TerminusDB, and cleaning up the raw data
+## Brief Summary
+Swoql consist of three modules:
+* woql.pl - contains swipl support for the asking WOQL queries,  and analysing the results
+* client.pl - handles connections to the TerminusDB server in http
+* logging.pl - utility for logging activity, reminiscent of the Python [logging facility](https://docs.python.org/3/library/logging.html).
 
-## Examples
-So far,  I only have four:
-* `charities` -- an example of an M:N relationship schema,  using public data about registered Irish charities.
-* `family-tree` -- an example of using composable subqueries,  using an external .csv file as raw data
-* `family-tree-2` -- another version of `family-tree` which uses in-memory structures to initialise the database,  rather than an external .csv file
-* `shipping` -- an animation of maritime traffic at Dublin port, using ephemeral events
+### Introduction
+Interactions with the TerminusDB server are handled via the `client.pl` module.  This uses swipl's [user-defined functions on dicts](https://www.swi-prolog.org/pldoc/man?section=ext-dict-user-functions). Thus,  every call to a `client` dict returns a new `client` dict in a style reminscent of function calls in other languages.  An example is:
+``` Client1 = client{}.create(Server, Account, User, Key)  % construct new Client
+Client2 = Client1.create_database(DB, 'Swoql', 'My first swipl DB!', Result) % create a new database```.
+
+WOQL queries are submitted by swoql's ask/3 primitive.  This takes a suitably initialised `client`,  and the query itself,  and returns a result representing the payload returned from the server.  
+
