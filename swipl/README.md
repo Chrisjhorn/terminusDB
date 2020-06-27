@@ -6,6 +6,7 @@ This is an Alpha Release for supporting WOQL (Web Oriented Query Language) in Sw
 * [Brief Summary](#brief-summary)
 * [Quick Start](#quick-start)
 * [Client API](#client-api)
+* [Logging API](#logging-api)
 
 ## Installation
 Install [Swipl](https://www.swi-prolog.org/download/stable).
@@ -149,3 +150,39 @@ Client2 = Client.create_graph('inference', 'my graph', Result),
 -> true
 ;  format('Could not create graph!~n')),
 ```
+
+
+## Logging API
+
+### set_stream(+Stream)
+Set the current stream for logging.
+
+### get_stream(+Stream)
+Get the current logging stream.
+
+### set_level(+Level)
+Set the threshold for making log entries.  Only log entry categories equal to or above this theshold will be made.
+
+INFOs messages are level 0.  WARNINGs are level 1. ERRORs are level 2.
+
+### get_level(-Level)
+Get the current threshold for making log entries.  Only log entry categories equal to or above this theshold will be made.
+
+INFOs messages are level 0.  WARNINGs are level 1. ERRORs are level 2.
+
+### fatal(+Str, +List)
+Report an ERROR with message `Str` and its parameters in `List`.  Conditionally abort the swoql application.
+
+### fatal(+Str)
+Call fatal/2 with an empty `List`.
+
+### log(+File, +Level)
+Create a log.  
+
+`File` is either `current_output`,  or an absolute or relative (to the current working directory) file path.
+
+`Level` is the threshold level.  Log entries below this level will be suppressed.
+
+### log()
+Same as `log(current_output, 0).`
+
