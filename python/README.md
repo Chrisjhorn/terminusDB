@@ -1,6 +1,8 @@
 # TerminusDB
 Some contributed tutorial and example software in Python to the [TerminusDB](https://terminusdb.com/) open source graph base.
 
+*THIS CODE HAS NOT YET BEEN UPDATED TO THE NEW PYTHON CLIENT LIBRARY API OF THE TERMINUS DB "HUB" RELEASE.*
+
 ## Tutorials
 The tutorials each are a [Jupyter Notebook](https://jupyter.org/),  so that you can interactively run the Python yourself as you read through the text.
 
