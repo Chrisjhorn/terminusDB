@@ -6,18 +6,25 @@ This is an Alpha Release for supporting WOQL (Web Oriented Query Language) in Sw
 * [Brief Summary](#brief-summary)
 * [Quick Start](#quick-start)
 * [Client API](#client-api)
+* [Woql API](#woql-api)
 * [Logging API](#logging-api)
+
+***
 
 ## Installation
 Install [Swipl](https://www.swi-prolog.org/download/stable).
 
 Download the modules and folders here.
 
+***
+
 ## Brief Summary
 Swoql consist of three modules:
 * woql.pl - contains swipl support for the asking WOQL queries,  and analysing the results
 * client.pl - handles connections to the TerminusDB server in http
 * logging.pl - utility for logging activity, reminiscent of the Python [logging facility](https://docs.python.org/3/library/logging.html).
+
+***
 
 ## Quick Start
 Interactions with the TerminusDB server are handled via the `client.pl` module.  This uses swipl's [user-defined functions on dicts](https://www.swi-prolog.org/pldoc/man?section=ext-dict-user-functions). Thus,  every call to a `client` dict returns a new `client` dict in a style reminscent of function calls in other languages.  An example is:
@@ -95,6 +102,7 @@ This places the log output into `logfile.log` in the current working directory. 
   }
 }
 ```
+***
 
 ## Client API
 
@@ -152,9 +160,123 @@ Client2 = Client.delete_database('GDPR data', Result),
 -> true
 ;  format('Database could not be deleted!~n')),
 ```
+***
+
+## WOQL API
+
+### ask(+Client, +Query, -Reply)
+Ask the given query of the database and server as represented by the client,  and return the result.
+
+The query should be any legitimate composition of the [swoql](#swoql) verbs.
+
+### empty_response(+Reply)
+True if a reply is empty (i.e. has no bindings).
+
+### pretty_print(+RepliesList)
+Print the contents of a list of results to `current_output`.
+
+### process_result(+Reply, -RepliesList)
+Converts a reply into a list of results.  Each result is a dict.
+
+### result_check_statistic(+Category, +Target, -Reply)
+True if a reply has the target value for one of its statistical counters.  `Category` should be any of `bindings, deletes inserts` or `transaction_retry_count`.
+
+### result_success(+Result)
+True if the result was successful.
+
+***
+
+## Swoql
+
+### add_quad(subject, predicate, object, graph)
+Create a new `quad`.
+
+### add_triple(subject, predicate, object)
+Create a new `triple`.
+
+### and([list of swoql verbs])
+Form a swoql query by `and-ing` together all the subqueries in the given list.
+
+### as(alias, swoql variable)
+Use the `alias` -- a .csv file column name -- to obtain values for the swoql variable.
+
+### cast(swoql variable,  swoql variable^^Type)
+Type-cast the first swoql variable into the second swoql variable and associated type.
+
+### concat(string, swoql variable)
+Concatenate the given WOQL variable value into the given string.
+
+### delete_triple(subject, predicate, object)
+Delete the specified triple.
+
+### delete_quad(subject, predicate, object, graph)
+Delete the specified quad.
+
+### doctype(document name, Swoql primitive)
+Create a new document (category) with given name, and associated fields.  The `Swoql primitive` is either a single `property`,  or a list of properties. 
+
+### doctype(document name)
+Create a new document (category) with given name (and no associated properties).
+
+### eq(left term, right term)
+Test whether the left and right terms (swoql verbs, or compositions of verbs) are equal.
+
+### file(file path, Swoql get)
+Read the contents of the local (.csv) file and use it to match against the given swoql `get`. 
+
+### get([list of swoql `as` verbs])
+Get and match a list of (typically, .csv data rows) values against the swoql variables given in the associated `as` verbs.
+
+### get_csv(URI or file path, Swoql get)
+Do a `file` or `remote`,  depending on whether the first parameter is a file path or web URI.
+
+### greater (left term, right term)
+Test whether the left term (swoql verb, or compositions of verbs) is greater than the right term (ditto).
+
+### idgen(document name, list of value keys, Swoql variable)
+Use the list of key values, and document name,  to generate unique keys for the given swoql variable.
+
+### insert(Swoql variable^^Type, Swoql qualifier)
+Create a new value for the given swoql variable of the specified type,  with associated values (typically properties) given by the swoql verb qualifier.
+
+### less (left term, right term)
+Test whether the left term (swoql verb, or compositions of verbs) is less than the right term (ditto).
+
+### not (swoql primitive)
+Test the opposite of the given swoql primitive.
+
+### opt(Swoql primitive)
+Specify that the given swoql primitive is optional.
+
+### or([list of swoql verbs])
+Form a swoql query by `or-ing` together all the subqueries in the given list.
+
+### property(Swoql variable^^Type)
+Declare a property into a schema with the given swoql variable name,  and associated type.
+
+### property(Name, Variable or type)
+Insert a property with the given name, using the given variable or type.
+
+### quad(subject, predicate, object, graph)
+Query whether there are any quads matching the given parameters.
+
+### remote(URL, Swoql get)
+Read the contents of the remote (.csv) file specified by the URL,  and use it to match against the given swoql `get`. 
+
+### select([list of Swoql variables], 'and'/'where' primitive)
+Select values only for those swoql variables given in the list, from the query given by the associated `and` or `when`.
+
+### triple(subject, predicate, object, graph)
+Query whether there are any triples matching the given parameters.
+
+### when(Swoql query,  Swoql update)
+Make the updates specified only for those values which match the given query.
+
+### where([list of swoql verbs])
+Synonym for swoql `and`.
 
 
-
+***
 
 ## Logging API
 
