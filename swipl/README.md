@@ -3,7 +3,7 @@ This is an Alpha Release for supporting WOQL (Web Oriented Query Language) in Sw
 
 Currently,  the entire set of WOQL primitives available in the Javascript and Python is not yet supported for swipl.  The subset of primitives supported so far is listed [below](#swoql).
 
-I'ld be grateful if you would report an errors,  or suggestions,  via the TerminusDb [discord](https://discord.com/) server.
+I'ld be grateful if you would report an errors,  or suggestions, to me via the TerminusDb [discord](https://discord.com/) server.
 
 ## Index:
 * [Installation](#installation)
@@ -11,7 +11,7 @@ I'ld be grateful if you would report an errors,  or suggestions,  via the Termin
 * [Quick Start](#quick-start)
 * [Client API](#client-api)
 * [Woql API](#woql-api)
-* [Swoql](#swoql)
+* [Swoql Verbs](#swoql_verbs)
 * [Logging API](#logging-api)
 
 ***
@@ -25,13 +25,15 @@ Download the modules and folders here.
 
 ## Brief Summary
 Swoql consist of three modules:
-* woql.pl - contains swipl support for the asking WOQL queries,  and analysing the results
+* swoql.pl - contains swipl support for the asking WOQL queries,  and analysing the results
 * client.pl - handles connections to the TerminusDB server in http
 * logging.pl - utility for logging activity, reminiscent of the Python [logging facility](https://docs.python.org/3/library/logging.html).
 
 ***
 
 ## Quick Start
+If you are already familiar with swipl,  and either the Javascript or Python binding to WOQL, then here's a short summary of how WOQL is used from swipl.
+
 Interactions with the TerminusDB server are handled via the `client.pl` module.  This uses swipl's [user-defined functions on dicts](https://www.swi-prolog.org/pldoc/man?section=ext-dict-user-functions). Thus,  every call to a `client` dict returns a new `client` dict in a style reminscent of function calls in other languages.  An example is:
 ```
 Client1 = client{}.create(Server, Account, User, Key)                        % construct new Client
@@ -71,7 +73,7 @@ This tests for an empty result returned by the server.  If the result is non-emp
 
 Finally, the logging facility can be used to log all calls and responses (with associated payloads) to the server.  It can also be used directly by a swoql application to place entries into the log.  The log is usually to a file, but it can also be set to `current_output`.  Each log entry has an aassociated date and timestamp.  Log entries can be informational, warnings or errors.  The severity of the three different categories can be filtered out from the log.  Fatal errors can optionally abort the application.
 
-By default, Swoql logs all three categories of entries,  and aborts on a fatal error.  Logging is initialised as (usually at the start of a swoql script):
+By default, swoql logs all three categories of entries,  and aborts on a fatal error.  Logging is initialised as (usually at the start of a swoql script):
 ```
 logging:log('logfile.log')
 ```
@@ -107,6 +109,59 @@ This places the log output into `logfile.log` in the current working directory. 
   }
 }
 ```
+
+***
+
+## Short introduction to swoql (and WOQL)
+If you have not used WOQL before,  then here are the essential concepts.
+
+TerminusDB stores "documents",  which are akin to objects or entities in other systems.  Each document can have an arbitrary set of associated properties (such as "name", "height", "age", "width",  etc).  In principle every document in a particular document class has the same set of properties,  but it is also possible to add or delete properties to individual documents without changing its peers in its class.
+
+Each document can form 1:1 or 1:M or M:N relationships with other documents.  Relationships are also documents,  and can have their own set of properties.  For example a marine shipping application may have "ships", "berths", and "routes".  Ships and berths may form relationship relating to the duration of a docking.  Ships and routes may form a relationship relating to the transit times of particular ships on particular routes.
+
+WOQL queries relate a subject via a predicate to an object,  in a `triple`. The subject of a query may be specified to be a particular value (eg a particular document),  or be represented as WOQL variable.  In the latter case,  all triples which match the predicate and object parts of the triple,  are valid responses to the query.  The responses will have a set of subject documents,  whose predicate and object parts match the query.
+
+Equally,  the predicate and object parts may also be fixed to particular values,  or be represented as WOQL variables.
+
+In swoql, a WOQL variable can be written as `'v:<identifier>'` eg `'v:person'`,  following the same syntax as the Javascript and Python WOQL bindings.  In swoql (but not in Javascript or Python), a WOQL variable can alternatively be written as `v(<identifier>)`,  eg `v(person)`.
+
+Based on the above, the contents of an entire database can be matched as (all subjects, all predicates, all objects):
+```
+triple(v(alpha), v(beta), v(gamma))
+```
+
+More realistically,  the following triple might be used to query all documents which have a `'Name'` property:
+```
+triple(v(person), 'Name', v(name))
+```
+In this case, all possible subject and object values are returned,  where the subject and object are related by `'Name'`
+
+In the following query, the triples which have a `'Name'` predicate linking a subject to an object, and the triples which have the very same subjects but with a `'Age'` predicate linking to another object, are returned.  However the `select` verb then indicates only the two sets of objects should be returned:
+```
+select([v(name), v(age)],
+                  where([triple(v(person), 'Name', v(name)),
+                         triple(v(person, 'Age', v(age))
+```
+
+To actually ask a query in swoql,  the `ask/3` predicate is used:
+``` 
+swoql:ask(Client,
+            select([v(name), v(age)],
+                  where([triple(v(person), 'Name', v(name)),
+                         triple(v(person, 'Age', v(age))
+            Result)
+```
+Here `Client` should be already bound to a `client` dict from the `client` module, and suitably initialised and connected to a TerminusDB database.  The `Result` will be the (complex structure) result returned by TerminusDB.
+
+Finally, WOQL uses schemas to be able to safely navigate and infer document structures.  A swoql schema for documents which match the above query might be:
+```
+doctype('personType',  and([
+                             property('Name'^^'string'),
+                             property('Age'^^'integer')]))
+```
+
+I suggest looking at the tutorial examples as a next step.
+
 ***
 
 ## Client API
@@ -129,7 +184,7 @@ Client = client{}.create('http://localhost:6363', 'admin', 'admin', Key)
 ### create_database(+DB, +Label, +Description, +Include_Schema, -Result) := client{}
 Create a new database with the given name,  given label and given description.  If the `Include_Schema` flag is set,  implicitly allow new schemas to be created in the database (otherwise,  schemas need to be created with a special server endpoint for that database).  Eg:
 ```
- Client2 = Client.create_database(DB, 'Swoql', 'My first swoql DB!', Result),
+ Client2 = Client.create_database(DB, 'swoql', 'My first swoql DB!', Result),
  (woql:result_success(Result)
  -> true
  ;  logging:fatal('Could not create database!'))
@@ -142,7 +197,7 @@ Calls create_database/5 with the `Include_Schema` flag set to true.
 ### create_graph(+DB, +GraphType, +GraphId, -Result) := client{}
 Creates a graph for the named database.  `GraphType` is one of `schema, instance` or `inference`. Eg:
 ```
-Client2 = Client.create_graph('Swoql', 'inference', 'my graph', Result),
+Client2 = Client.create_graph('swoql', 'inference', 'my graph', Result),
 (woql:result_success(Result)
 -> true
 ;  format('Could not create graph!~n')),
@@ -190,9 +245,10 @@ True if a reply has the target value for one of its statistical counters.  `Cate
 ### result_success(+Result)
 True if the result was successful.
 
+
 ***
 
-## Swoql
+## Swoql Verbs
 
 ### add_quad(subject, predicate, object, graph)
 Create a new `quad`.
@@ -224,7 +280,7 @@ Introduce a description to a `doctype`..   The label is then associated with the
 doctype('person`) << description('details of a person')
 ```
 
-### doctype(document name, Swoql primitive)
+### doctype(document name, swoql primitive)
 Create a new document (category) with given name, and associated fields.  The `Swoql primitive` is either a single `property`,  or a list of properties. 
 
 ### doctype(document name)
@@ -239,16 +295,16 @@ Read the contents of the local (.csv) file and use it to match against the given
 ### get([list of swoql `as` verbs])
 Get and match a list of (typically, .csv data rows) values against the swoql variables given in the associated `as` verbs.
 
-### get_csv(URI or file path, Swoql get)
+### get_csv(URI or file path, swoql get)
 Do a `file` or `remote`,  depending on whether the first parameter is a file path or web URI.
 
 ### greater (left term, right term)
 Test whether the left term (swoql verb, or compositions of verbs) is greater than the right term (ditto).
 
-### idgen(document name, list of value keys, Swoql variable)
+### idgen(document name, list of value keys, swoql variable)
 Use the list of key values, and document name,  to generate unique keys for the given swoql variable.
 
-### insert(Swoql variable^^Type, Swoql qualifier)
+### insert(Swoql variable^^Type, swoql qualifier)
 Create a new value for the given swoql variable of the specified type,  with associated values (typically properties) given by the swoql verb qualifier.
 
 ### label(string)
@@ -269,7 +325,7 @@ Specify that the given swoql primitive is optional.
 ### or([list of swoql verbs])
 Form a swoql query by `or-ing` together all the subqueries in the given list.
 
-### property(Swoql variable^^Type)
+### property(swoql variable^^Type)
 Declare a property into a schema with the given swoql variable name,  and associated type.
 
 ### property(Name, Variable or type)
@@ -278,10 +334,10 @@ Insert a property with the given name, using the given variable or type.
 ### quad(subject, predicate, object, graph)
 Query whether there are any quads matching the given parameters.
 
-### remote(URL, Swoql get)
+### remote(URL, swoql get)
 Read the contents of the remote (.csv) file specified by the URL,  and use it to match against the given swoql `get`. 
 
-### select([list of Swoql variables], 'and'/'where' primitive)
+### select([list of swoql variables], 'and'/'where' primitive)
 Select values only for those swoql variables given in the list, from the query given by the associated `and` or `where`.
 
 ### triple(subject, predicate, object, graph)
