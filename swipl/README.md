@@ -159,13 +159,13 @@ Client2 = Client.delete_database('GDPR data', Result),
 ## Logging API
 
 ### error(+Msg, +List)
-Make an ERROR log entry with the given message (in swipl standard `format`),  and list of arguments.
+Make an ERROR log entry with the given message (in swipl standard [format](https://www.swi-prolog.org/pldoc/man?predicate=format/2),  and list of arguments.
 
-### error(+Msg, +List)
-Same as `error(Msg)`.
+### error(+Msg)
+Same as `error(Msg, [])`.
 
 ### fatal(+Str, +List)
-Report an ERROR with message `Str` and its parameters in `List`.  Conditionally abort the swoql application.
+Report an ERROR with message `Str`(in swipl standard [format](https://www.swi-prolog.org/pldoc/man?predicate=format/2) and its parameters in `List`.  Conditionally abort the swoql application.
 
 ### fatal(+Str)
 Call fatal/2 with an empty `List`.
@@ -179,17 +179,17 @@ INFOs messages are level 0.  WARNINGs are level 1. ERRORs are level 2.
 Get the current logging stream.
 
 ### info(+Msg, +List)
-Make an INFO log entry with the given message (in swipl standard `format`),  and list of arguments.
+Make an INFO log entry with the given message (in swipl standard [format](https://www.swi-prolog.org/pldoc/man?predicate=format/2),  and list of arguments.
 
-### info(+Msg, +List)
-Same as `info(Msg)`.
+### info(+Msg)
+Same as `info(Msg, [])`.
 
 ### log(+File, +Level)
 Create a log.  
 
 `File` is either `current_output`,  or an absolute or relative (to the current working directory) file path.
 
-`Level` is the threshold level.  Log entries below this level will be suppressed.
+`Level` is the threshold level.  Log entries below this level will be suppressed.  INFOs messages are level 0.  WARNINGs are level 1. ERRORs are level 2.
 
 ### log()
 Same as `log(current_output, 0).`
@@ -206,9 +206,9 @@ INFOs messages are level 0.  WARNINGs are level 1. ERRORs are level 2.
 Set the current stream for logging.
 
 ### warning(+Msg, +List)
-Make a WARNING log entry with the given message (in swipl standard `format`),  and list of arguments.
+Make a WARNING log entry with the given message (in swipl standard [format](https://www.swi-prolog.org/pldoc/man?predicate=format/2)),  and list of arguments.
 
-### warning(+Msg, +List)
-Same as `warning(Msg)`.
+### warning(+Msg)
+Same as `warning(Msg, [])`.
 
 
