@@ -104,15 +104,6 @@ Construct a new client dict,  using the four string arguments passed.  Eg:
 Client = client{}.create('http://localhost:6363', 'admin', 'admin', Key)
 ```
 
-### connect(-Result) := client{}
-Connect to the server, as given in the client dict. Eg:
-```
-Client2 = Client.connect(Result)
-(woql:result_success(Result)
--> true
-;  logging:fatal('Could not connect to the server!')),
-```
-
 ### create_database(+DB, +Label, +Description, +Include_Schema, -Result) := client{}
 Create a new database with the given name,  given label and given description.  If the `Include_Schema` flag is set,  implicitly allow new schemas to be created in the database (otherwise,  schemas need to be created with a special server endpoint for that database).  Eg:
 ```
@@ -121,17 +112,10 @@ Create a new database with the given name,  given label and given description.  
  -> true
  ;  logging:fatal('Could not create database!'))
  ```
+
 ### create_database(+DB, +Label, +Description, -Result) := client{}
 Calls create_database/5 with the `Include_Schema` flag set to true.
 
-### delete_database(+DB, -Result) := client{}
-Delete the named database. Eg:
-```
-Client2 = Client.delete_database('GDPR data', Result),
-(woql:result_success(Result)
--> true
-;  format('Database could not be deleted!~n')),
-```
 
 ### create_graph(+DB, +GraphType, +GraphId, -Result) := client{}
 Creates a graph for the named database.  `GraphType` is one of `schema, instance` or `inference`. Eg:
@@ -151,30 +135,54 @@ Client2 = Client.create_graph('inference', 'my graph', Result),
 ;  format('Could not create graph!~n')),
 ```
 
+### connect(-Result) := client{}
+Connect to the server, as given in the client dict. Eg:
+```
+Client2 = Client.connect(Result)
+(woql:result_success(Result)
+-> true
+;  logging:fatal('Could not connect to the server!')),
+```
+
+### delete_database(+DB, -Result) := client{}
+Delete the named database. Eg:
+```
+Client2 = Client.delete_database('GDPR data', Result),
+(woql:result_success(Result)
+-> true
+;  format('Database could not be deleted!~n')),
+```
+
+
+
 
 ## Logging API
 
-### set_stream(+Stream)
-Set the current stream for logging.
+### error(+Msg, +List)
+Make an ERROR log entry with the given message (in swipl standard `format`),  and list of arguments.
 
-### get_stream(+Stream)
-Get the current logging stream.
-
-### set_level(+Level)
-Set the threshold for making log entries.  Only log entry categories equal to or above this theshold will be made.
-
-INFOs messages are level 0.  WARNINGs are level 1. ERRORs are level 2.
-
-### get_level(-Level)
-Get the current threshold for making log entries.  Only log entry categories equal to or above this theshold will be made.
-
-INFOs messages are level 0.  WARNINGs are level 1. ERRORs are level 2.
+### error(+Msg, +List)
+Same as `error(Msg)`.
 
 ### fatal(+Str, +List)
 Report an ERROR with message `Str` and its parameters in `List`.  Conditionally abort the swoql application.
 
 ### fatal(+Str)
 Call fatal/2 with an empty `List`.
+
+### get_level(-Level)
+Get the current threshold for making log entries.  Only log entry categories equal to or above this theshold will be made.
+
+INFOs messages are level 0.  WARNINGs are level 1. ERRORs are level 2.
+
+### get_stream(+Stream)
+Get the current logging stream.
+
+### info(+Msg, +List)
+Make an INFO log entry with the given message (in swipl standard `format`),  and list of arguments.
+
+### info(+Msg, +List)
+Same as `info(Msg)`.
 
 ### log(+File, +Level)
 Create a log.  
@@ -185,4 +193,22 @@ Create a log.
 
 ### log()
 Same as `log(current_output, 0).`
+
+### log(+File)
+Same as `log(File, 0)`.
+
+### set_level(+Level)
+Set the threshold for making log entries.  Only log entry categories equal to or above this theshold will be made.
+
+INFOs messages are level 0.  WARNINGs are level 1. ERRORs are level 2.
+
+### set_stream(+Stream)
+Set the current stream for logging.
+
+### warning(+Msg, +List)
+Make a WARNING log entry with the given message (in swipl standard `format`),  and list of arguments.
+
+### warning(+Msg, +List)
+Same as `warning(Msg)`.
+
 
