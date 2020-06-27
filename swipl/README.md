@@ -12,7 +12,7 @@ Swoql consist of three modules:
 * client.pl - handles connections to the TerminusDB server in http
 * logging.pl - utility for logging activity, reminiscent of the Python [logging facility](https://docs.python.org/3/library/logging.html).
 
-### Introduction
+### Quick Start
 Interactions with the TerminusDB server are handled via the `client.pl` module.  This uses swipl's [user-defined functions on dicts](https://www.swi-prolog.org/pldoc/man?section=ext-dict-user-functions). Thus,  every call to a `client` dict returns a new `client` dict in a style reminscent of function calls in other languages.  An example is:
 ```
 Client1 = client{}.create(Server, Account, User, Key)                        % construct new Client
