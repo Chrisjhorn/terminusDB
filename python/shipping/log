@@ -1,0 +1,6 @@
+[Connecting to the TerminusDB server..]
+[Removing prior version of the database,  if it exists..]
+[Creating new database..]
+[Building schema..]
+[Loading raw data from 'voyages.csv'..]
+[Loading raw data from 'dockings.csv'..]
