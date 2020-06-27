@@ -276,13 +276,13 @@ Delete the specified triple.
 Delete the specified quad.
 
 ### description(string)
-Introduce a description to a `doctype`..   The label is then associated with the doctype using the `<<` operator: eg
+Introduce a description to a `doctype`.   The label is then associated with the doctype using the `<<` operator: eg
 ```
-doctype('person`) << description('details of a person')
+doctype('person') << description('details of a person')
 ```
 
 ### doctype(document name, swoql primitive)
-Create a new document (category) with given name, and associated fields.  The `Swoql primitive` is either a single `property`,  or a list of properties. 
+Create a new document (category) with given name, and associated fields.  The `swoql primitive` is either a single `property`,  or a list of properties. 
 
 ### doctype(document name)
 Create a new document (category) with given name (and no associated properties).
@@ -311,7 +311,7 @@ Create a new value for the given swoql variable of the specified type,  with ass
 ### label(string)
 Introduce a label to a `doctype` or `property` entity.   The label is then associated with the entity using the `<<` operator: eg
 ```
-doctype('person`) << label('an individual')
+doctype('person') << label('an individual')
 ```
 
 ### less (left term, right term)
