@@ -137,7 +137,7 @@ triple(v(person), 'Name', v(name))
 ```
 In this case, all possible subject and object values are returned,  where the subject and object are related by `'Name'`
 
-In the following query, the triples which have a `'Name'` predicate linking a subject to an object, and the triples which have the very same subjects but with a `'Age'` predicate linking to another object, are returned.  However the `select` verb then indicates only the two sets of objects should be returned:
+In the following query, the triples which have a `'Name'` predicate linking a subject to an object, and the triples which have the very same subjects but with an `'Age'` predicate linking to another object, are returned.  However the `select` verb then indicates only the two sets of objects should be returned:
 ```
 select([v(name), v(age)],
                   where([triple(v(person), 'Name', v(name)),
