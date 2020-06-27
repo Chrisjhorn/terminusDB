@@ -217,6 +217,12 @@ Delete the specified triple.
 ### delete_quad(subject, predicate, object, graph)
 Delete the specified quad.
 
+### description(string)
+Introduce a description to a `doctype`..   The label is then associated with the doctype using the `<<` operator: eg
+```
+doctype('person`) << description('details of a person')
+```
+
 ### doctype(document name, Swoql primitive)
 Create a new document (category) with given name, and associated fields.  The `Swoql primitive` is either a single `property`,  or a list of properties. 
 
@@ -243,6 +249,12 @@ Use the list of key values, and document name,  to generate unique keys for the 
 
 ### insert(Swoql variable^^Type, Swoql qualifier)
 Create a new value for the given swoql variable of the specified type,  with associated values (typically properties) given by the swoql verb qualifier.
+
+### label(string)
+Introduce a label to a `doctype` or `property` entity.   The label is then associated with the entity using the `<<` operator: eg
+```
+doctype('person`) << label('an individual')
+```
 
 ### less (left term, right term)
 Test whether the left term (swoql verb, or compositions of verbs) is less than the right term (ditto).
