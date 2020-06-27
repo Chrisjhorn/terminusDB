@@ -7,6 +7,7 @@ This is an Alpha Release for supporting WOQL (Web Oriented Query Language) in Sw
 * [Quick Start](#quick-start)
 * [Client API](#client-api)
 * [Woql API](#woql-api)
+* [Swoql](#swoql)
 * [Logging API](#logging-api)
 
 ***
