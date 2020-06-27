@@ -12,7 +12,7 @@ Swoql consist of three modules:
 * client.pl - handles connections to the TerminusDB server in http
 * logging.pl - utility for logging activity, reminiscent of the Python [logging facility](https://docs.python.org/3/library/logging.html).
 
-### Quick Start
+## Quick Start
 Interactions with the TerminusDB server are handled via the `client.pl` module.  This uses swipl's [user-defined functions on dicts](https://www.swi-prolog.org/pldoc/man?section=ext-dict-user-functions). Thus,  every call to a `client` dict returns a new `client` dict in a style reminscent of function calls in other languages.  An example is:
 ```
 Client1 = client{}.create(Server, Account, User, Key)                        % construct new Client
@@ -87,4 +87,59 @@ This places the log output into `logfile.log` in the current working directory. 
     }
   }
 }
+```
+
+## Client API
+
+### create(+Server, +Account, +User, +Key) := client{} 
+Construct a new client dict,  using the four string arguments passed.  Eg:
+```
+Client = client{}.create('http://localhost:6363', 'admin', 'admin', Key)
+```
+
+### connect(-Result) := client{}
+Connect to the server, as given in the client dict. Eg:
+```
+Client2 = Client.connect(Result)
+(woql:result_success(Result)
+-> true
+;  logging:fatal('Could not connect to the server!')),
+```
+
+### create_database(+DB, +Label, +Description, +Include_Schema, -Result) := client{}
+Create a new database with the given name,  given label and given description.  If the `Include_Schema` flag is set,  implicitly allow new schemas to be created in the database (otherwise,  schemas need to be created with a special server endpoint for that database).  Eg:
+```
+ Client2 = Client.create_database(DB, 'Swoql', 'My first swoql DB!', Result),
+ (woql:result_success(Result)
+ -> true
+ ;  logging:fatal('Could not create database!'))
+ ```
+### create_database(+DB, +Label, +Description, -Result) := client{}
+Calls create_database/5 with the `Include_Schema` flag set to true.
+
+### delete_database(+DB, -Result) := client{}
+Delete the named database. Eg:
+```
+Client2 = Client.delete_database('GDPR data', Result),
+(woql:result_success(Result)
+-> true
+;  format('Database could not be deleted!~n')),
+```
+
+### create_graph(+DB, +GraphType, +GraphId, -Result) := client{}
+Creates a graph for the named database.  `GraphType` is one of `schema, instance` or `inference`. Eg:
+```
+Client2 = Client.create_graph('Swoql', 'inference', 'my graph', Result),
+(woql:result_success(Result)
+-> true
+;  format('Could not create graph!~n')),
+```
+
+### create_graph(+GraphType, +GraphId, -Result) := client{}
+Creates a graph for the database known in the `client` dict.  Eg:
+```
+Client2 = Client.create_graph('inference', 'my graph', Result),
+(woql:result_success(Result)
+-> true
+;  format('Could not create graph!~n')),
 ```
