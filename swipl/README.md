@@ -1,6 +1,10 @@
 # Swoql - Swipl and WOQL
 This is an Alpha Release for supporting WOQL (Web Oriented Query Language) in Swipl for the [TerminusDB](https://terminusdb.com/) open source graph base.
 
+Currently,  the entire set of WOQL primitives available in the Javascript and Python is not yet supported for swipl.  The subset of primitives supported so far is listed [below](#swoql).
+
+I'ld be grateful if you would report an errors,  or suggestions,  via the TerminusDb [discord](https://discord.com/) server.
+
 ## Index:
 * [Installation](#installation)
 * [Brief Summary](#brief-summary)
