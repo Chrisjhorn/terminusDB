@@ -171,7 +171,7 @@ I suggest looking at the tutorial examples as a next step.
 Connect to the server, as given in the client dict. Eg:
 ```
 Client2 = Client.connect(Result)
-(woql:result_success(Result)
+(swoql:result_success(Result)
 -> true
 ;  logging:fatal('Could not connect to the server!')),
 ```
@@ -186,7 +186,7 @@ Client = client{}.create('http://localhost:6363', 'admin', 'admin', Key)
 Create a new database with the given name,  given label and given description.  If the `Include_Schema` flag is set,  implicitly allow new schemas to be created in the database (otherwise,  schemas need to be created with a special server endpoint for that database).  Eg:
 ```
  Client2 = Client.create_database(DB, 'swoql', 'My first swoql DB!', Result),
- (woql:result_success(Result)
+ (swoql:result_success(Result)
  -> true
  ;  logging:fatal('Could not create database!'))
  ```
@@ -199,7 +199,7 @@ Calls create_database/5 with the `Include_Schema` flag set to true.
 Creates a graph for the named database.  `GraphType` is one of `schema, instance` or `inference`. Eg:
 ```
 Client2 = Client.create_graph('swoql', 'inference', 'my graph', Result),
-(woql:result_success(Result)
+(swoql:result_success(Result)
 -> true
 ;  format('Could not create graph!~n')),
 ```
@@ -208,7 +208,7 @@ Client2 = Client.create_graph('swoql', 'inference', 'my graph', Result),
 Creates a graph for the database known in the `client` dict.  Eg:
 ```
 Client2 = Client.create_graph('inference', 'my graph', Result),
-(woql:result_success(Result)
+(swoql:result_success(Result)
 -> true
 ;  format('Could not create graph!~n')),
 ```
@@ -218,7 +218,7 @@ Client2 = Client.create_graph('inference', 'my graph', Result),
 Delete the named database. Eg:
 ```
 Client2 = Client.delete_database('GDPR data', Result),
-(woql:result_success(Result)
+(swoql:result_success(Result)
 -> true
 ;  format('Database could not be deleted!~n')),
 ```
