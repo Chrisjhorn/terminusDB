@@ -186,7 +186,7 @@ True if the result was successful.
 
 ***
 
-## Swoql
+## Swoql
 
 ### add_quad(subject, predicate, object, graph)
 Create a new `quad`.
