@@ -183,7 +183,7 @@ Print the contents of a list of results to `current_output`.
 ### process_result(+Reply, -RepliesList)
 Converts a reply into a list of results.  Each result is a dict.
 
-### result_check_statistic(+Category, +Target, -Reply)
+### result_check_statistic(+Category, +Target, +Reply)
 True if a reply has the target value for one of its statistical counters.  `Category` should be any of `bindings, deletes inserts` or `transaction_retry_count`.
 
 ### result_success(+Result)
