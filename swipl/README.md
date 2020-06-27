@@ -14,8 +14,8 @@ Swoql consist of three modules:
 
 ### Introduction
 Interactions with the TerminusDB server are handled via the `client.pl` module.  This uses swipl's [user-defined functions on dicts](https://www.swi-prolog.org/pldoc/man?section=ext-dict-user-functions). Thus,  every call to a `client` dict returns a new `client` dict in a style reminscent of function calls in other languages.  An example is:
-``` Client1 = client{}.create(Server, Account, User, Key)  % construct new Client
-Client2 = Client1.create_database(DB, 'Swoql', 'My first swipl DB!', Result) % create a new database```.
+```Client1 = client{}.create(Server, Account, User, Key)  % construct new Client```
+```Client2 = Client1.create_database(DB, 'Swoql', 'My first swipl DB!', Result) % create a new database```.
 
 WOQL queries are submitted by swoql's ask/3 primitive.  This takes a suitably initialised `client`,  and the query itself,  and returns a result representing the payload returned from the server.  
 
