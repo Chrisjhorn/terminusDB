@@ -9,6 +9,7 @@ I'ld be grateful if you would report an errors,  or suggestions, to me via the T
 * [Installation](#installation)
 * [Brief Summary](#brief-summary)
 * [Quick Start](#quick-start)
+* [Short Introduction to swoql (and WOQL)](#short-introduction-to-swoql-and-woql)
 * [Client API](#client-api)
 * [Woql API](#woql-api)
 * [Swoql Verbs](#swoql_verbs)
