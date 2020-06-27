@@ -269,7 +269,7 @@ Query whether there are any quads matching the given parameters.
 Read the contents of the remote (.csv) file specified by the URL,  and use it to match against the given swoql `get`. 
 
 ### select([list of Swoql variables], 'and'/'where' primitive)
-Select values only for those swoql variables given in the list, from the query given by the associated `and` or `when`.
+Select values only for those swoql variables given in the list, from the query given by the associated `and` or `where`.
 
 ### triple(subject, predicate, object, graph)
 Query whether there are any triples matching the given parameters.
