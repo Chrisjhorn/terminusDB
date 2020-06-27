@@ -111,6 +111,15 @@ This places the log output into `logfile.log` in the current working directory. 
 
 ## Client API
 
+### connect(-Result) := client{}
+Connect to the server, as given in the client dict. Eg:
+```
+Client2 = Client.connect(Result)
+(woql:result_success(Result)
+-> true
+;  logging:fatal('Could not connect to the server!')),
+```
+
 ### create(+Server, +Account, +User, +Key) := client{} 
 Construct a new client dict,  using the four string arguments passed.  Eg:
 ```
@@ -148,14 +157,6 @@ Client2 = Client.create_graph('inference', 'my graph', Result),
 ;  format('Could not create graph!~n')),
 ```
 
-### connect(-Result) := client{}
-Connect to the server, as given in the client dict. Eg:
-```
-Client2 = Client.connect(Result)
-(woql:result_success(Result)
--> true
-;  logging:fatal('Could not connect to the server!')),
-```
 
 ### delete_database(+DB, -Result) := client{}
 Delete the named database. Eg:
