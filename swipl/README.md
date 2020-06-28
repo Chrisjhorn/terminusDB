@@ -72,7 +72,7 @@ WOQL variables can be in the same `v:<identifier>` format as is used in both Jav
 Swoql has various facilities for analysing the result of a query.  For example:
 ```
  (woql:empty_response(Result)
- -> format('Empty Result!!..~n')
+ -> format('Empty Result!!..]~n')
  ;  woql:process_result(Result, PResult),
     woql:pretty_print(PResult))
 ```
