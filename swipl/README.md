@@ -126,7 +126,7 @@ TerminusDB stores "documents",  which are akin to objects or entities in other s
 
 Each document can form 1:1 or 1:M or M:N relationships with other documents.  Relationships are also documents,  and can have their own set of properties.  For example a marine shipping application may have "ships", "berths", and "routes".  Ships and berths may form a relationship relating to the duration of a docking.  Ships and routes may form a relationship relating to the transit times of particular ships on particular routes.
 
-WOQL queries relate a subject via a predicate to an object,  in a `triple`. The subject of a query may be specified to be a particular value (eg a particular document),  or be represented as WOQL variable.  In the latter case,  all triples which match the predicate and object parts of the triple,  are valid responses to the query.  The responses will have a set of subject documents,  whose predicate and object parts match the query.
+WOQL queries relate a subject via a predicate to an object,  in a `triple`. The subject of a query may be a particular value (eg a particular document),  or be represented as WOQL variable.  In the latter case,  all triples which match the predicate and object parts of the triple,  are valid responses to the query.  The responses will have a set of subject documents,  whose predicate and object parts match the query.
 
 Equally,  the predicate and object parts may also be fixed to particular values,  or be represented as WOQL variables.
 
