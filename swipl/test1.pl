@@ -190,11 +190,6 @@ run() :-
     test('Test-PropLab2', Client, doctype('PersonTypePropLab2',
                                         and([property('PL2Name'^^'string') << label('PL2Name_property'),
                                              property('PL2Age'^^'integer') << label('PL2Age_property') ])), 10),
-    % test('Test-PropLab3', Client, doctype('PersonTypePropLab3',
-    %                                          doctype('PersonType',  and([
-    %                                                                  property('Name'^^'string') << label('first_name'),
-    %                                                                  property('Age'^^'integer') << label('years')
-    %                                          ])) << label('Some Person') << description('Somebody'))),
     test('Test-PropLab3', Client, doctype('PersonTypePropLab3',
                                              and([property('PL3Name'^^'string') << label('PL3first_name'),
                                                   property('PL3Age'^^'integer') << label('PL3years')
