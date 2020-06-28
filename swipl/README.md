@@ -248,7 +248,7 @@ The query should be any legitimate composition of the [swoql](#swoql) verbs.
 ### empty_response(+Reply)
 True if a reply is empty (i.e. has no bindings).
 
-### get_bindingsget_bindings(+Reply, -BindingsList)
+### get_bindings(+Reply, -BindingsList)
 Extract the bindings list from a reply.
 
 ### pretty_print(+RepliesList)
