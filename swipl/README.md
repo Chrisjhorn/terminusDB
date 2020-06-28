@@ -30,6 +30,12 @@ Swoql consist of three modules:
 * client.pl - handles connections to the TerminusDB server in http
 * logging.pl - utility for logging activity, reminiscent of the Python [logging facility](https://docs.python.org/3/library/logging.html).
 
+There are also a number of tutorial examples in the 'tutorials' folder:
+* Tutorial_1 - uses an in-memory set of data to build a new TerminusDB database,  and queries it
+* Tutorial_2 - uses an external .csv file (on the web) to build a new TerminusDB database,  and queries it
+* Tutorial_3 - a swoql version of the 'bike tutorial', as appears in the standard Javascript and Python distributions.
+
+Finally,  the 'test1.pl' module is a set of self-tests, verifying that swoql is behaving itself.
 ***
 
 ## Quick Start
