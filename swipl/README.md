@@ -310,7 +310,7 @@ Test whether the left and right terms (swoql verbs, or compositions of verbs) ar
 ### file(file path, Swoql get)
 Read the contents of the local (.csv) file and use it to match against the given swoql `get`. 
 
-### get([list of swoql `as` verbs])
+### get([list of swoql 'as' verbs])
 Get and match a list of (typically, .csv data rows) values against the swoql variables given in the associated `as` verbs.
 
 ### get_csv(URI or file path, swoql get)
