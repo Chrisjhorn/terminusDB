@@ -340,7 +340,7 @@ Test whether the left term (swoql verb, or compositions of verbs) is less than t
 ### not (swoql primitive)
 Test the opposite of the given swoql primitive.
 
-### opt(Swoql primitive)
+### opt(swoql primitive)
 Specify that the given swoql primitive is optional.
 
 ### or([list of swoql verbs])
