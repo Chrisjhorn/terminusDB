@@ -311,6 +311,9 @@ Use the list of key values, and document name,  to generate unique keys for the 
 ### insert(Swoql variable^^Type, swoql qualifier)
 Create a new value for the given swoql variable of the specified type,  with associated values (typically properties) given by the swoql verb qualifier.
 
+### insert(Swoql variable^^Type)
+Create a new value for the given swoql variable of the specified type.
+
 ### label(string)
 Introduce a label to a `doctype` or `property` entity.   The label is then associated with the entity using the `<<` operator: eg
 ```
