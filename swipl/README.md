@@ -319,8 +319,8 @@ Do a `file` or `remote`,  depending on whether the first parameter is a file pat
 ### greater (left term, right term)
 Test whether the left term (swoql verb, or compositions of verbs) is greater than the right term (ditto).
 
-### idgen(document name, list of value keys, swoql variable)
-Use the list of key values, and document name,  to generate unique keys for the given swoql variable.
+### idgen(document name, list of value keys or a swoql variable, swoql variable)
+Use the list of key values,  or the set of values associated with a swoql variable, together with the document name,  to generate unique keys for the swoql variable given as the last argument.
 
 ### insert(Swoql variable^^Type, swoql qualifier)
 Create a new value for the given swoql variable of the specified type,  with associated values (typically properties) given by the swoql verb qualifier.
