@@ -304,7 +304,7 @@ maplist_with_counter(F, Cnt, [A|As], [B|Bs]) :-
 /*
  *  Support for lists of asks (queries)
  *
- *    collect_ask_list - ?
+ *    collect_ask_list - collects asks across a list
  *    do_ask_list - apply ask across a list
  */
 
