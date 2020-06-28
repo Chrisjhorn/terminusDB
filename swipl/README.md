@@ -122,7 +122,7 @@ This places the log output into `logfile.log` in the current working directory. 
 ## Short introduction to swoql (and WOQL)
 If you have not used WOQL before,  then here are the essential concepts.
 
-TerminusDB stores "documents",  which are akin to objects or entities in other systems.  Each document can have an arbitrary set of associated properties (such as "name", "height", "age", "width",  etc).  In principle every document in a particular document class has the same set of properties,  but it is also possible to add or delete properties to individual documents without changing its peers in its class.  By the way, document classes can also form inheritance hierarchies.
+TerminusDB stores "documents",  which are akin to objects or entities in other systems.  Each document can have an arbitrary set of associated properties (such as "name", "height", "age", "width",  etc).  In principle every document in a particular document class has the same set of properties,  but it is also possible to add or delete properties to individual documents without changing its peers in its class.  Document classes can also form inheritance hierarchies.
 
 Each document can form 1:1 or 1:M or M:N relationships with other documents.  Relationships are also documents,  and can have their own set of properties.  For example a marine shipping application may have "ships", "berths", and "routes".  Ships and berths may form a relationship relating to the duration of a docking.  Ships and routes may form a relationship relating to the transit times of particular ships on particular routes.
 
