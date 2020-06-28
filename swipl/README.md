@@ -141,9 +141,17 @@ More realistically,  the following triple might be used to query all documents w
 ```
 triple(v(person), 'Name', v(name))
 ```
-In this case, all possible subject and object values are returned,  where the subject and object are related by `'Name'`
+In this case, all possible subject and object values are returned,  where the subject and object are related by `'Name'`.  
 
-In the following query, the triples which have a `'Name'` predicate linking a subject to an object, and the triples which have the very same subjects but with an `'Age'` predicate linking to another object, are returned.  However the `select` verb then indicates only the two sets of objects should be returned:
+One important point is that the identifiers used in WOQL variables are entirely at the developers discretion. Each such variable is bound to a set of (alternative) values by the TerminusDB server.  These values are then used for that variable in the remainder of the query.  Thus,  three different queries such as:
+
+* Query1: ```triple(v(person), 'Name', v(name))```
+* Query2: ```triple(v(a), 'Name', v(b))```
+* Query3: ```triple(v(foo), 'Name', v(bar))```
+
+will all return the same result.
+
+In the following query, the triples which have a `'Name'` predicate linking a subject to an object, and the triples which have the very same subjects but with an `'Age'` predicate linking to another object, are returned.  However the `select` verb then indicates only the sets of values given by `v(name)` and `v(age)`  should be returned:
 ```
 select([v(name), v(age)],
                   where([triple(v(person), 'Name', v(name)),
