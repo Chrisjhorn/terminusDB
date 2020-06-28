@@ -123,22 +123,7 @@ run() :-
 
 
 
-   % populate the new database using an external .csv file
-   %
-   %  when:
-   %       read the .csv file as given by Resource
-   %       get the following columns from that .csv file:
-   %           Nr, and use it for v:Nr
-   %           Name, and use it for v:Name
-   %           Age, and use it for v:Age
-   %           Partner, and use it for v:Partner
-   %       idgen new ids for PersonType documents, based on v:Nr values
-   %  then:
-   %       insert a new PersonType document with id v:People_ID
-   %           and Age property,  the v:Age value
-   %           and Partner property,  the v:Partner value
-   %       and finally give it a label using the v:Name value
-   %
+   % populate the new database using the external .csv file
    format('- Populating data -----------------------------------------------~n'),
    data_url(Resource),
    woql:ask(Client,

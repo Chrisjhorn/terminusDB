@@ -134,6 +134,11 @@ run() :-
    %           and Partner property,  the v:Partner value
    %       and finally give it a label using the v:Name value
    %
+   %  Note that a cast is used to convert the string value of an age,  into
+   %  an integer as is specified in the schema (see above).  This is arguably
+   %  a bug in TerminusDB,  since a numeric .csv column probably could be
+   %  implicitly converted from a string.  Anyway: a cast is used here..
+   %
    format('- Populating data -----------------------------------------------~n'),
    data_url(Resource),
    woql:ask(Client,
