@@ -307,7 +307,7 @@ Create a new document (category) with given name (and no associated properties).
 ### eq(left term, right term)
 Test whether the left and right terms (swoql verbs, or compositions of verbs) are equal.
 
-### file(file path, Swoql get)
+### file(file path, swoql get)
 Read the contents of the local (.csv) file and use it to match against the given swoql `get`. 
 
 ### get([list of swoql 'as' verbs])
@@ -322,10 +322,10 @@ Test whether the left term (swoql verb, or compositions of verbs) is greater tha
 ### idgen(document name, list of value keys or a swoql variable, swoql variable)
 Use the list of key values,  or the set of values associated with a swoql variable, together with the document name,  to generate unique keys for the swoql variable given as the last argument.
 
-### insert(Swoql variable^^Type, swoql qualifier)
+### insert(swoql variable^^Type, swoql qualifier)
 Create a new value for the given swoql variable of the specified type,  with associated values (typically properties) given by the swoql verb qualifier.
 
-### insert(Swoql variable^^Type)
+### insert(swoql variable^^Type)
 Create a new value for the given swoql variable of the specified type.
 
 ### label(string)
@@ -364,7 +364,7 @@ Select values only for those swoql variables given in the list, from the query g
 ### triple(subject, predicate, object, graph)
 Query whether there are any triples matching the given parameters.
 
-### when(Swoql query,  Swoql update)
+### when(swoql query,  swoql update)
 Make the updates specified only for those values which match the given query.
 
 ### where([list of swoql verbs])
